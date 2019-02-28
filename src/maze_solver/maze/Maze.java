@@ -2,10 +2,10 @@ package maze_solver.maze;
 
 public class Maze {
 
-    private static final int RIGHT_WALL = 0;
-    private static final int TOP_WALL = 1;
-    private static final int LEFT_WALL = 2;
-    private static final int BOTTOM_WALL = 4;
+    public static final int RIGHT_WALL = 0;
+    public static final int TOP_WALL = 1;
+    public static final int LEFT_WALL = 2;
+    public static final int BOTTOM_WALL = 4;
     private static final int X_DIR = 0;
     private static final int Y_DIR = 1;
     int cols;
@@ -19,8 +19,8 @@ public class Maze {
 
     Cell[][] cell;
 
-    public Maze(){
-        this(5,4,new Point2D(0,0), new Point2D(3,4),null,new Cell[5][4]);
+    public Maze() {
+        this(5, 4, new Point2D(0, 0), new Point2D(3, 4), null, new Cell[5][4]);
         initMazeWalls();
         System.out.println("initial maze created");
         current = start;
@@ -36,8 +36,8 @@ public class Maze {
         this.cell = cell;
     }
 
-    public void initMazeWalls(){
-        int max_size = Integer.max(cols,rows) +1;
+    public void initMazeWalls() {
+        int max_size = Integer.max(cols, rows) + 1;
         maze_walls = new int[2][max_size];
         explored_maze_walls = new int[2][max_size];
 
@@ -61,23 +61,39 @@ public class Maze {
         maze_walls[Y_DIR][0] = 0b1111;
     }
 
-    public boolean getWall(int x, int y, int wall_type){
-        switch (wall_type){
-            case LEFT_WALL:{
-                return (maze_walls[Y_DIR][x]>>y == 0b1);
+    public boolean getWall(Point2D point, int wall_type) {
+        return getWall(point.x, point.y, wall_type);
+    }
+
+    public boolean getWall(int x, int y, int wall_type) {
+        switch (wall_type) {
+            case LEFT_WALL: {
+                return ((maze_walls[Y_DIR][x] >> y & 0b1) == 0b1);
             }
-            case RIGHT_WALL:{
-                return (maze_walls[Y_DIR][x+1]>>y == 0b1);
+            case RIGHT_WALL: {
+                return ((maze_walls[Y_DIR][x + 1] >> y & 0b1) == 0b1);
             }
-            case BOTTOM_WALL:{
-                return (maze_walls[X_DIR][y]>>x == 0b1);
+            case BOTTOM_WALL: {
+                return ((maze_walls[X_DIR][y] >> x & 0b1) == 0b1);
             }
-            case TOP_WALL:{
-                return (maze_walls[X_DIR][y+1]>>x == 0b1);
+            case TOP_WALL: {
+                return ((maze_walls[X_DIR][y + 1] >> x & 0b1) == 0b1);
             }
             default:
                 System.err.println("no wall type was given.");
                 return false;
         }
+    }
+
+    public Point2D getStart() {
+        return start;
+    }
+
+    public Point2D getEnd() {
+        return end;
+    }
+
+    public Point2D getCurrent() {
+        return current;
     }
 }
