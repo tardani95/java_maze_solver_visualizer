@@ -100,7 +100,7 @@ public class Controller {
                 if ((mazeWalls[0][row_i] & (0b1 << coll_i)) > 0) {
                     startX =  coll_i * cell_size;
                     stopX =  (coll_i + 1) * cell_size;
-                    startY =  (maze.getRows() - row_i) * cell_size;
+                    startY =  row_i * cell_size;
                     stopY = startY;
 
                     gc.strokeLine(startX, startY, stopX, stopY);
@@ -115,8 +115,8 @@ public class Controller {
                 if ((mazeWalls[1][coll_i] & (0b1 << row_i)) > 0) {
                     startX = coll_i * cell_size;
                     stopX = startX;
-                    startY =( maze.getRows() - row_i) * cell_size;
-                    stopY = ( maze.getRows() - (row_i + 1)) * cell_size;
+                    startY = row_i * cell_size;
+                    stopY = (row_i + 1) * cell_size;
 
                     gc.strokeLine(startX, startY, stopX, stopY);
                 }
