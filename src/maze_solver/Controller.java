@@ -15,10 +15,14 @@ import maze_solver.maze.Point2D;
 
 public class Controller {
 
-    @FXML TabPane tabPane;
-    @FXML AnchorPane simulation_anchor_pane;
-    @FXML Slider slider_cell_size;
-    @FXML Canvas canvas;
+    @FXML
+    TabPane tabPane;
+    @FXML
+    AnchorPane simulation_anchor_pane;
+    @FXML
+    Slider slider_cell_size;
+    @FXML
+    Canvas canvas;
 
     private double width;
     private double height;
@@ -42,19 +46,19 @@ public class Controller {
 
         tabPane.widthProperty().addListener((observable, oldValue, newValue) -> {
             width = newValue.doubleValue();
-            canvas.setWidth(width/2);
+            canvas.setWidth(width / 2);
             drawMaze(null);
         });
         tabPane.heightProperty().addListener((observable, oldValue, newValue) -> {
             height = newValue.doubleValue();
-            canvas.setHeight(height/2);
+            canvas.setHeight(height / 2);
             drawMaze(null);
         });
     }
 
     public void onSliderChanged(MouseEvent mouseEvent) {
         cell_size = slider_cell_size.getValue();
-        System.out.println("Cell size changed to "+String.valueOf(cell_size) + "px" );
+        System.out.println("Cell size changed to " + String.valueOf(cell_size) + "px");
         drawMaze(null);
     }
 
@@ -65,27 +69,29 @@ public class Controller {
     public void drawMaze(MouseEvent mouseEvent) {
         System.out.println("drawMaze() called");
 
-        double width = cell_size*maze.getCols();
-        double height = cell_size*maze.getRows();
+        double width = cell_size * maze.getCols();
+        double height = cell_size * maze.getRows();
 
         canvas.setWidth(width);
         canvas.setHeight(height);
-        gc.clearRect(0,0,width,height);
+        gc.clearRect(0, 0, width, height);
 
-        drawMazeWalls(maze.getWalls(), Color.RED,1);
+        drawMazeWalls(maze.getWalls(), Color.RED, 1);
 
-        drawMazeWalls(maze.getExploredWalls(), Color.BLACK,2);
+        drawMazeWalls(maze.getExploredWalls(), Color.BLACK, 2);
 
-        drawPoint(maze.getStart(), Color.GREENYELLOW);
-        drawPoint(maze.getEnd(), Color.ORANGERED);
+        drawPoint(maze.getStart(), Color.GREENYELLOW,5);
+        drawPoint(maze.getEnd(), Color.ORANGERED,5);
 //        drawMazeOutline();
     }
 
-    private void drawPoint(Point2D start, Color greenyellow) {
-//        gc.fillRect(s);
+    private void drawPoint(Point2D point, Color color, double padding) {
+        gc.setFill(color);
+        gc.fillRect(point.x * cell_size + padding, point.y * cell_size + padding, cell_size - 2* padding
+                , cell_size - 2* padding);
     }
 
-    private void drawMazeWalls(int[][] mazeWalls, Color color, double lineWidth){
+    private void drawMazeWalls(int[][] mazeWalls, Color color, double lineWidth) {
         double startX;
         double startY;
         double stopX;
@@ -98,9 +104,9 @@ public class Controller {
             for (int coll_i = 0; coll_i < maze.getCols(); coll_i++) {
 
                 if ((mazeWalls[0][row_i] & (0b1 << coll_i)) > 0) {
-                    startX =  coll_i * cell_size;
-                    stopX =  (coll_i + 1) * cell_size;
-                    startY =  row_i * cell_size;
+                    startX = coll_i * cell_size;
+                    stopX = (coll_i + 1) * cell_size;
+                    startY = row_i * cell_size;
                     stopY = startY;
 
                     gc.strokeLine(startX, startY, stopX, stopY);
@@ -110,7 +116,7 @@ public class Controller {
 
         //print vertical walls
         for (int coll_i = 0; coll_i < maze.getCols() + 1; coll_i++) {
-            for (int row_i = 0; row_i <  maze.getRows(); row_i++) {
+            for (int row_i = 0; row_i < maze.getRows(); row_i++) {
 
                 if ((mazeWalls[1][coll_i] & (0b1 << row_i)) > 0) {
                     startX = coll_i * cell_size;
@@ -124,9 +130,9 @@ public class Controller {
         }
     }
 
-    private void drawMazeOutline(){
+    private void drawMazeOutline() {
         gc.setStroke(Color.BLACK);
         gc.setLineWidth(3);
-        gc.strokeRect(0,0,maze.getCols()*cell_size,maze.getRows()*cell_size);
+        gc.strokeRect(0, 0, maze.getCols() * cell_size, maze.getRows() * cell_size);
     }
 }

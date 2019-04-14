@@ -1,5 +1,6 @@
 package maze_solver.maze;
 
+
 public class Maze {
 
     private static Maze instance = new Maze();
@@ -21,12 +22,12 @@ public class Maze {
 
     Cell[][] cell;
 
-    public  static Maze getInstance() {
+    public static Maze getInstance() {
         return instance;
     }
 
     private Maze() {
-        this(5, 4, new Point2D(0, 0), new Point2D(3, 4), null, new Cell[5][4]);
+        this(5, 4, new Point2D(0, 0), new Point2D(3, 3), null, new Cell[5][4]);
         initMazeWalls();
         System.out.println("initial maze created");
         current = start;
@@ -67,11 +68,11 @@ public class Maze {
         walls[Y_DIR][0] = 0b1111;
     }
 
-    public boolean getWall(Point2D point, int wall_type) {
-        return getWall(point.x, point.y, wall_type);
+    public boolean getWall(int[][] walls, Point2D point, int wall_type) {
+        return getWall(walls, point.x, point.y, wall_type);
     }
 
-    public boolean getWall(int x, int y, int wall_type) {
+    public boolean getWall(int[][] walls, int x, int y, int wall_type) {
         switch (wall_type) {
             case LEFT_WALL: {
                 return ((walls[Y_DIR][x] >> y & 0b1) == 0b1);
@@ -89,6 +90,36 @@ public class Maze {
                 System.err.println("no wall type was given.");
                 return false;
         }
+    }
+
+    public boolean setWall(int[][] walls, Point2D point, int wall_type) {
+        return setWall(walls, point.x, point.y, wall_type);
+    }
+
+    public boolean setWall(int[][] walls, int x, int y, int wall_type) {
+        switch (wall_type) {
+            case LEFT_WALL: {
+                walls[Y_DIR][x] |= (0b1 << y);
+            }
+            break;
+            case RIGHT_WALL: {
+                walls[Y_DIR][x + 1] |= (0b1 << y);
+
+            }
+            break;
+            case BOTTOM_WALL: {
+                walls[X_DIR][y] |= (0b1 << x);
+            }
+            break;
+            case TOP_WALL: {
+                walls[X_DIR][y + 1] |= (0b1 << x);
+            }
+            break;
+            default:
+                System.err.println("invalid wall type");
+                return false;
+        }
+        return true;
     }
 
     public Point2D getStart() {
@@ -115,7 +146,170 @@ public class Maze {
         return walls;
     }
 
-    public int[][] getExploredWalls(){
+    public int[][] getExploredWalls() {
         return explored_maze_walls;
+    }
+
+    public void pathFind(Point2D start, Point2D end, int type, int heuristic) {
+        if (start != null) {
+            this.start = start;
+        }
+        if (end != null) {
+            this.end = end;
+        }
+
+        calcDistances(end, heuristic);
+        initCost();
+
+        switch (type) {
+            case 0: {
+                bestDepthFirstSearch(start);
+            }
+            break;
+            case 1: {
+                System.out.println("A* not implemented");
+            }
+            break;
+            default:
+                System.err.println("no such a path finding method");
+                break;
+        }
+    }
+
+    public void calcDistances(Point2D p, int heuristic) {
+        switch (heuristic) {
+            case 0: {
+                System.out.println("Euler heuristic distance calculation");
+
+
+            }
+            break;
+            case 1: {
+                System.out.println("Manhattam heuristic distance calculation");
+            }
+            break;
+            default:
+                System.err.println("not implemented heuristic");
+                return;
+        }
+        for (int i = 0; i < cols; i++) {
+            for (int j = 0; j < rows; j++) {
+                cell[i][j].setDestination_distance((int) p.distanceTo(i, j, heuristic));
+            }
+        }
+        System.out.println("distances calculated");
+
+    }
+
+    public void initCost() {
+        for (int i = 0; i < cols; i++) {
+            for (int j = 0; j < rows; j++) {
+                cell[i][j].setCost(Integer.MAX_VALUE);
+            }
+        }
+        System.out.println("initial cost set to integer max value");
+    }
+
+    public boolean bestDepthFirstSearch(Point2D point2D) {
+        return bestDepthFirstSearch(point2D.x, point2D.y);
+    }
+
+    public boolean bestDepthFirstSearch(int x, int y) {
+        current.x = x;
+        current.y = y;
+
+        // set actual node as visited
+        cell[current.x][current.y].setVisited();
+
+        // if end point reached then terminate
+        if (current.equals(end)) {
+            return true;
+        }
+
+        // discover nearby walls
+        discoverWalls(current);
+
+        // calculates the following best move
+        Point2D nextPosition = calcNextPosition(current);
+
+        // set next move cell parent
+        cell[nextPosition.x][nextPosition.y].setParent(cell[current.x][current.y]);
+
+
+        return bestDepthFirstSearch(nextPosition);
+    }
+
+
+    public void discoverWalls(Point2D current) {
+        for (int wallType = 0; wallType < 4; ++wallType) {
+            if (getWall(walls, current, wallType)) {
+                setWall(explored_maze_walls, current, wallType);
+            }
+        }
+    }
+
+    private Point2D calcNextPosition(Point2D current) {
+        if (current == null) {
+            return null;
+        }
+        if (current.equals(end)) {
+            return end;
+        }
+
+        int currentCost = cell[current.x][current.y].getCost();
+        int min_distance = 10000;
+
+        Point2D nextPosition = new Point2D(current.x, current.y);
+        Point2D p = null;
+
+        for (int wallType = 0; wallType < 4; ++wallType) {
+            if (!getWall(explored_maze_walls, current, wallType)) {
+                switch (wallType) {
+                    //TODO - check equality operator with doubles
+                    case 0: {
+                        p = new Point2D(current.x + 1, current.y);
+                    }
+                    break;
+                    case 1: {
+                        p = new Point2D(current.x, current.y + 1);
+
+                    }
+                    break;
+                    case 2: {
+                        if (current.x > 0) {
+                            p = new Point2D(current.x - 1, current.y);
+
+                        } else {
+                            continue;
+                        }
+                    }
+                    break;
+                    case 3: {
+                        if (current.y > 0) {
+                            p = new Point2D(current.x, current.y - 1);
+
+                        } else {
+                            continue;
+                        }
+                    }
+                    break;
+                    default:
+                        break;
+                }
+                if (p != null) {
+                    if (cell[p.x][p.y].getCost() > (currentCost + 1)) {
+                        cell[p.x][p.y].setCost(currentCost + 1);
+                        cell[p.x][p.y].setParent(cell[current.x][current.y]);
+                    }
+
+                    if (cell[p.x][p.y].getDestination_distance() < min_distance) {
+                        nextPosition = p;
+                        min_distance = cell[p.x][p.y].getDestination_distance();
+                    }
+                }
+            }
+        }
+
+        return nextPosition;
     }
 }

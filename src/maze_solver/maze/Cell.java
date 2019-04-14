@@ -33,6 +33,10 @@ public class Cell {
         return parent;
     }
 
+    public void setDestination_distance(int destination_distance) {
+        this.destination_distance = destination_distance;
+    }
+
     public void setVisited() {
         this.visited = true;
     }
@@ -44,4 +48,5 @@ public class Cell {
     public void setParent(Cell parent) {
         this.parent = parent;
     }
+
 }
