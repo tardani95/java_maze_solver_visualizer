@@ -107,7 +107,7 @@ public class Controller {
         canvas.setHeight(height);
         gc.clearRect(0, 0, width, height);
 
-//        drawVisitedCells(Color.GRAY);
+        drawVisitedCells(Color.GRAY);
         drawMazeWalls(maze.getWalls(), Color.RED, 1);
         drawMazeWalls(maze.getExploredWalls(), Color.BLACK, 2);
 

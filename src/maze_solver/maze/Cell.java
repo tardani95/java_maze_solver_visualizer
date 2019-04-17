@@ -5,12 +5,18 @@ public class Cell {
     public int destination_distance;
     public int cost;
     public Cell parent;
+    public Point2D coordinate;
 
     public Cell() {
-        this(false,Integer.MAX_VALUE,Integer.MAX_VALUE,null);
+        this(new Point2D(0,0), false,Integer.MAX_VALUE,Integer.MAX_VALUE,null);
     }
 
-    public Cell(boolean visited, int destination_distance, int cost, Cell parent) {
+    public Cell(int x, int y){
+        this(new Point2D(x,y), false,Integer.MAX_VALUE,Integer.MAX_VALUE,null);
+    }
+
+    public Cell(Point2D coordinate, boolean visited, int destination_distance, int cost, Cell parent) {
+        this.coordinate = new Point2D(coordinate.x,coordinate.y);
         this.visited = visited;
         this.destination_distance = destination_distance;
         this.cost = cost;
@@ -49,4 +55,11 @@ public class Cell {
         this.parent = parent;
     }
 
+    public Point2D getCoordinate() {
+        return coordinate;
+    }
+
+    public void setCoordinate(Point2D coordinate) {
+        this.coordinate = coordinate;
+    }
 }

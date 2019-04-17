@@ -8,7 +8,7 @@ public class Maze {
     public static final int RIGHT_WALL = 0;
     public static final int TOP_WALL = 1;
     public static final int LEFT_WALL = 2;
-    public static final int BOTTOM_WALL = 4;
+    public static final int BOTTOM_WALL = 3;
     private static final int X_DIR = 0;
     private static final int Y_DIR = 1;
     private int cols;
@@ -48,7 +48,7 @@ public class Maze {
         Cell c = null;
         for(int x = 0; x<cols; x++){
             for(int y = 0; y < rows; y++){
-                c = cell[x][y] = new Cell();
+                c = cell[x][y] = new Cell(x,y);
                 c.setDestination_distance( (int) (new Point2D(x,y)).distanceTo(end,0));
             }
         }
@@ -278,7 +278,7 @@ public class Maze {
         int currentCost = cell[current.x][current.y].getCost();
         int min_distance = 10000;
 
-        Point2D nextPosition = new Point2D(current.x, current.y);
+        Point2D nextPosition = null;
         Point2D p = null;
 
         for (int wallType = 0; wallType < 4; ++wallType) {
@@ -338,9 +338,9 @@ public class Maze {
             }
         }
 
-        if(p == null){
+        if(nextPosition == null){
             Cell parent = cell[current.x][current.y].getParent();
-            return new Point2D();
+            return parent.getCoordinate();
         }
 
 
