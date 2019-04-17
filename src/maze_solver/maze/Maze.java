@@ -30,7 +30,7 @@ public class Maze {
         this(5, 4, new Point2D(0, 0), new Point2D(1, 0), null, new Cell[5][4]);
         initMazeWalls();
         System.out.println("initial maze created");
-        current = start;
+        current = new Point2D(start);
         System.out.println("current point set to start point");
     }
 
