@@ -1,5 +1,6 @@
 package maze_solver;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -64,6 +65,36 @@ public class Controller {
 
     public void runSimulation(MouseEvent mouseEvent) {
         System.out.println("run simulation button pressed");
+
+        Runnable BDFS = new Runnable() {
+            @Override
+            public void run() {
+                int counter = 0;
+                System.out.println("Counter value: " + counter);
+                while (!maze.bestDepthFirstSearch(maze.getCurrent())) {
+
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            drawMaze(null);
+                        }
+                    });
+
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException e) {
+                        System.out.println("Error: ");
+                        System.out.println(e.getMessage());
+                    }
+
+                    System.out.println("Counter value: " + counter);
+                }
+            }
+        };
+
+        new Thread(BDFS).start();
+
+
     }
 
     public void drawMaze(MouseEvent mouseEvent) {
@@ -76,19 +107,21 @@ public class Controller {
         canvas.setHeight(height);
         gc.clearRect(0, 0, width, height);
 
+//        drawVisitedCells(Color.GRAY);
         drawMazeWalls(maze.getWalls(), Color.RED, 1);
-
         drawMazeWalls(maze.getExploredWalls(), Color.BLACK, 2);
 
-        drawPoint(maze.getStart(), Color.GREENYELLOW,5);
-        drawPoint(maze.getEnd(), Color.ORANGERED,5);
+
+        drawPoint(maze.getCurrent(), Color.GREEN, 5);
+        drawPoint(maze.getStart(), Color.GREENYELLOW, 5);
+        drawPoint(maze.getEnd(), Color.ORANGERED, 5);
 //        drawMazeOutline();
     }
 
     private void drawPoint(Point2D point, Color color, double padding) {
         gc.setFill(color);
-        gc.fillRect(point.x * cell_size + padding, point.y * cell_size + padding, cell_size - 2* padding
-                , cell_size - 2* padding);
+        gc.fillRect(point.x * cell_size + padding, point.y * cell_size + padding, cell_size - 2 * padding
+                , cell_size - 2 * padding);
     }
 
     private void drawMazeWalls(int[][] mazeWalls, Color color, double lineWidth) {
@@ -125,6 +158,17 @@ public class Controller {
                     stopY = (row_i + 1) * cell_size;
 
                     gc.strokeLine(startX, startY, stopX, stopY);
+                }
+            }
+        }
+    }
+
+    private void drawVisitedCells(Color color) {
+        for (int x = 0; x < maze.getCols(); x++) {
+            for (int y = 0; y < maze.getRows(); y++) {
+                Point2D p = new Point2D(x, y);
+                if(maze.cell[p.x][p.y].isVisited()){
+                    drawPoint(p, color, 1);
                 }
             }
         }
