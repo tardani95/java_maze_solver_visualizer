@@ -247,7 +247,9 @@ public class Maze {
         Point2D nextPosition = calcNextPosition(current);
 
         // set next move cell parent
-        cell[nextPosition.x][nextPosition.y].setParent(cell[current.x][current.y]);
+        if(!cell[nextPosition.x][nextPosition.y].isVisited()){
+            cell[nextPosition.x][nextPosition.y].setParent(cell[current.x][current.y]);
+        }
 
         /*try*/
         current.x = nextPosition.x;

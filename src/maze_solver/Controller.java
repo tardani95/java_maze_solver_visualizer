@@ -111,10 +111,10 @@ public class Controller {
         drawMazeWalls(maze.getWalls(), Color.RED, 1);
         drawMazeWalls(maze.getExploredWalls(), Color.BLACK, 2);
 
-
         drawPoint(maze.getCurrent(), Color.GREEN, 5);
         drawPoint(maze.getStart(), Color.GREENYELLOW, 5);
         drawPoint(maze.getEnd(), Color.ORANGERED, 5);
+        drawPoint(maze.getCurrent(), Color.GREEN, 5);
 //        drawMazeOutline();
     }
 
