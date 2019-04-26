@@ -44,12 +44,12 @@ public class Maze {
         initCells();
     }
 
-    private void initCells(){
+    private void initCells() {
         Cell c = null;
-        for(int x = 0; x<cols; x++){
-            for(int y = 0; y < rows; y++){
-                c = cell[x][y] = new Cell(x,y);
-                c.setDestination_distance( (int) (new Point2D(x,y)).distanceTo(end,0));
+        for (int x = 0; x < cols; x++) {
+            for (int y = 0; y < rows; y++) {
+                c = cell[x][y] = new Cell(x, y);
+                c.setDestination_distance((int) (new Point2D(x, y)).distanceTo(end, 0));
             }
         }
         cell[start.x][start.y].setCost(0);
@@ -247,14 +247,14 @@ public class Maze {
         Point2D nextPosition = calcNextPosition(current);
 
         // set next move cell parent
-        if(!cell[nextPosition.x][nextPosition.y].isVisited()){
+        if (!cell[nextPosition.x][nextPosition.y].isVisited()) {
             cell[nextPosition.x][nextPosition.y].setParent(cell[current.x][current.y]);
         }
 
         /*try*/
         current.x = nextPosition.x;
         current.y = nextPosition.y;
-        return  false;
+        return false;
 
         /*end of try*/
 //        return bestDepthFirstSearch(nextPosition);
@@ -289,14 +289,14 @@ public class Maze {
                     //TODO - check equality operator with doubles
                     case 0: {
                         p = new Point2D(current.x + 1, current.y);
-                        if(cell[p.x][p.y].isVisited()){
+                        if (cell[p.x][p.y].isVisited()) {
                             p = null;
                         }
                     }
                     break;
                     case 1: {
                         p = new Point2D(current.x, current.y + 1);
-                        if(cell[p.x][p.y].isVisited()){
+                        if (cell[p.x][p.y].isVisited()) {
                             p = null;
                         }
                     }
@@ -304,7 +304,7 @@ public class Maze {
                     case 2: {
                         if (current.x > 0) {
                             p = new Point2D(current.x - 1, current.y);
-                            if(cell[p.x][p.y].isVisited()){
+                            if (cell[p.x][p.y].isVisited()) {
                                 p = null;
                             }
                         } else {
@@ -315,7 +315,7 @@ public class Maze {
                     case 3: {
                         if (current.y > 0) {
                             p = new Point2D(current.x, current.y - 1);
-                            if(cell[p.x][p.y].isVisited()){
+                            if (cell[p.x][p.y].isVisited()) {
                                 p = null;
                             }
                         } else {
@@ -340,7 +340,7 @@ public class Maze {
             }
         }
 
-        if(nextPosition == null){
+        if (nextPosition == null) {
             Cell parent = cell[current.x][current.y].getParent();
             return parent.getCoordinate();
         }
