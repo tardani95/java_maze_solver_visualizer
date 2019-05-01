@@ -5,20 +5,30 @@ public class Maze {
 
     private static Maze instance = new Maze();
 
-    public static final int RIGHT_WALL = 0;
-    public static final int TOP_WALL = 1;
-    public static final int LEFT_WALL = 2;
-    public static final int BOTTOM_WALL = 3;
+    public enum WallType {
+        RIGHT_WALL (0),
+        TOP_WALL (1),
+        LEFT_WALL (2),
+        BOTTOM_WALL (3);
+
+        public final int value;
+
+        WallType(int value) {
+            this.value = value;
+        }
+    }
+
     private static final int X_DIR = 0;
     private static final int Y_DIR = 1;
-    private int cols;
-    private int rows;
-    Point2D start;
-    Point2D end;
-    Point2D current;
+    private int length_X;
+    private int length_Y;
 
-    int[][] walls;
-    int[][] explored_maze_walls;
+    private Point2D start;
+    private Point2D end;
+    private Point2D current;
+
+    private int[][] walls;
+    private int[][] explored_maze_walls;
 
     public Cell[][] cell;
 
@@ -34,9 +44,9 @@ public class Maze {
         System.out.println("current point set to start point");
     }
 
-    public Maze(int cols, int rows, Point2D start, Point2D end, Point2D current, Cell[][] cell) {
-        this.cols = cols;
-        this.rows = rows;
+    private Maze(int cols, int rows, Point2D start, Point2D end, Point2D current, Cell[][] cell) {
+        this.length_X = cols;
+        this.length_Y = rows;
         this.start = start;
         this.end = end;
         this.current = current;
@@ -44,21 +54,18 @@ public class Maze {
         initCells();
     }
 
-    private void initCells(){
-        Cell c = null;
-        for(int x = 0; x<cols; x++){
-            for(int y = 0; y < rows; y++){
-                c = cell[x][y] = new Cell(x,y);
-                c.setDestination_distance( (int) (new Point2D(x,y)).distanceTo(end,0));
+    private void initCells() {
+        for (int x = 0; x < length_X; x++) {
+            for (int y = 0; y < length_Y; y++) {
+                cell[x][y] = new Cell(x, y);
+                cell[x][y].setDestination_distance((int) (new Point2D(x, y)).distanceTo(end, 0));
             }
         }
         cell[start.x][start.y].setCost(0);
-
-
     }
 
-    public void initMazeWalls() {
-        int max_size = Integer.max(cols, rows) + 1;
+    private void initMazeWalls() {
+        int max_size = Integer.max(length_X, length_Y) + 1;
         walls = new int[2][max_size];
         explored_maze_walls = new int[2][max_size];
 
@@ -82,11 +89,11 @@ public class Maze {
         walls[Y_DIR][0] = 0b1111;
     }
 
-    public boolean getWall(int[][] walls, Point2D point, int wall_type) {
+    public boolean getWall(int[][] walls, Point2D point, WallType wall_type) {
         return getWall(walls, point.x, point.y, wall_type);
     }
 
-    public boolean getWall(int[][] walls, int x, int y, int wall_type) {
+    public boolean getWall(int[][] walls, int x, int y, WallType wall_type) {
         switch (wall_type) {
             case LEFT_WALL: {
                 return ((walls[Y_DIR][x] >> y & 0b1) == 0b1);
@@ -106,11 +113,11 @@ public class Maze {
         }
     }
 
-    public boolean setWall(int[][] walls, Point2D point, int wall_type) {
+    public boolean setWall(int[][] walls, Point2D point, WallType wall_type) {
         return setWall(walls, point.x, point.y, wall_type);
     }
 
-    public boolean setWall(int[][] walls, int x, int y, int wall_type) {
+    public boolean setWall(int[][] walls, int x, int y, WallType wall_type) {
         switch (wall_type) {
             case LEFT_WALL: {
                 walls[Y_DIR][x] |= (0b1 << y);
@@ -136,6 +143,7 @@ public class Maze {
         return true;
     }
 
+
     public Point2D getStart() {
         return start;
     }
@@ -148,12 +156,12 @@ public class Maze {
         return current;
     }
 
-    public int getCols() {
-        return cols;
+    public int getLength_X() {
+        return length_X;
     }
 
-    public int getRows() {
-        return rows;
+    public int getLength_Y() {
+        return length_Y;
     }
 
     public int[][] getWalls() {
@@ -206,8 +214,8 @@ public class Maze {
                 System.err.println("not implemented heuristic");
                 return;
         }
-        for (int i = 0; i < cols; i++) {
-            for (int j = 0; j < rows; j++) {
+        for (int i = 0; i < length_X; i++) {
+            for (int j = 0; j < length_Y; j++) {
                 cell[i][j].setDestination_distance((int) p.distanceTo(i, j, heuristic));
             }
         }
@@ -216,8 +224,8 @@ public class Maze {
     }
 
     public void initCost() {
-        for (int i = 0; i < cols; i++) {
-            for (int j = 0; j < rows; j++) {
+        for (int i = 0; i < length_X; i++) {
+            for (int j = 0; j < length_Y; j++) {
                 cell[i][j].setCost(Integer.MAX_VALUE);
             }
         }
@@ -247,14 +255,14 @@ public class Maze {
         Point2D nextPosition = calcNextPosition(current);
 
         // set next move cell parent
-        if(!cell[nextPosition.x][nextPosition.y].isVisited()){
+        if (!cell[nextPosition.x][nextPosition.y].isVisited()) {
             cell[nextPosition.x][nextPosition.y].setParent(cell[current.x][current.y]);
         }
 
         /*try*/
         current.x = nextPosition.x;
         current.y = nextPosition.y;
-        return  false;
+        return false;
 
         /*end of try*/
 //        return bestDepthFirstSearch(nextPosition);
@@ -262,7 +270,7 @@ public class Maze {
 
 
     public void discoverWalls(Point2D current) {
-        for (int wallType = 0; wallType < 4; ++wallType) {
+        for (WallType wallType : WallType.values()) {
             if (getWall(walls, current, wallType)) {
                 setWall(explored_maze_walls, current, wallType);
             }
@@ -283,28 +291,28 @@ public class Maze {
         Point2D nextPosition = null;
         Point2D p = null;
 
-        for (int wallType = 0; wallType < 4; ++wallType) {
+        for (WallType wallType : WallType.values()) {
             if (!getWall(explored_maze_walls, current, wallType)) {
                 switch (wallType) {
                     //TODO - check equality operator with doubles
-                    case 0: {
+                    case RIGHT_WALL: {
                         p = new Point2D(current.x + 1, current.y);
-                        if(cell[p.x][p.y].isVisited()){
+                        if (cell[p.x][p.y].isVisited()) {
                             p = null;
                         }
                     }
                     break;
-                    case 1: {
+                    case TOP_WALL: {
                         p = new Point2D(current.x, current.y + 1);
-                        if(cell[p.x][p.y].isVisited()){
+                        if (cell[p.x][p.y].isVisited()) {
                             p = null;
                         }
                     }
                     break;
-                    case 2: {
+                    case LEFT_WALL: {
                         if (current.x > 0) {
                             p = new Point2D(current.x - 1, current.y);
-                            if(cell[p.x][p.y].isVisited()){
+                            if (cell[p.x][p.y].isVisited()) {
                                 p = null;
                             }
                         } else {
@@ -312,10 +320,10 @@ public class Maze {
                         }
                     }
                     break;
-                    case 3: {
+                    case BOTTOM_WALL: {
                         if (current.y > 0) {
                             p = new Point2D(current.x, current.y - 1);
-                            if(cell[p.x][p.y].isVisited()){
+                            if (cell[p.x][p.y].isVisited()) {
                                 p = null;
                             }
                         } else {
@@ -340,7 +348,7 @@ public class Maze {
             }
         }
 
-        if(nextPosition == null){
+        if (nextPosition == null) {
             Cell parent = cell[current.x][current.y].getParent();
             return parent.getCoordinate();
         }

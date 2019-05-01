@@ -8,8 +8,8 @@ public class Point2D {
         this(0, 0);
     }
 
-    public Point2D(Point2D p){
-        this(p.x,p.y);
+    public Point2D(Point2D p) {
+        this(p.x, p.y);
     }
 
     public Point2D(int x, int y) {
@@ -31,7 +31,7 @@ public class Point2D {
     }
 
     public double distanceTo(Point2D p2, int heuristic) {
-        return distanceTo(p2.x,p2.y,heuristic);
+        return distanceTo(p2.x, p2.y, heuristic);
     }
 
     public double distanceTo(int x, int y, int heuristic) {
