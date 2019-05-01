@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.jfoenix.controls.JFXColorPicker?>
 <?import javafx.geometry.Point3D?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
@@ -8,22 +9,33 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Text?>
+<?import maze_solver.view.MazeView?>
 
 <TabPane fx:id="tabPane" minHeight="576.0" minWidth="1024.0" prefHeight="576.0" prefWidth="1024.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="maze_solver.Controller">
     <tabs>
         <Tab text="MazeEditor">
             <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                <AnchorPane fx:id="maze_editor_anchor_pane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                    <children>
+                        <JFXColorPicker layoutX="501.0" layoutY="364.0" />
+                        <MazeView fx:id="canvas_maze_editor" height="282.0" layoutX="24.0" layoutY="24.0" rotate="180.0" width="504.0" AnchorPane.leftAnchor="24.0" AnchorPane.topAnchor="24.0">
+                            <rotationAxis>
+                                <Point3D x="1.0" />
+                            </rotationAxis>
+                        </MazeView>
+                    </children>
+                </AnchorPane>
             </content>
         </Tab>
         <Tab text="Simulation">
             <content>
                 <AnchorPane fx:id="simulation_anchor_pane" minHeight="0.0" minWidth="0.0" prefHeight="436.0" prefWidth="580.0">
                     <children>
-                        <Canvas fx:id="canvas" height="200.0" layoutX="14.0" layoutY="14.0" rotate="180.0" width="200.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0">
-                     <rotationAxis>
-                        <Point3D x="1.0" />
-                     </rotationAxis></Canvas>
+                        <MazeView fx:id="canvas_simulation" height="282.0" layoutX="14.0" layoutY="14.0" rotate="180.0" width="504.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0">
+                            <rotationAxis>
+                                <Point3D x="1.0" />
+                            </rotationAxis>
+                        </MazeView>
                         <Button layoutX="902.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#drawMaze" prefHeight="25.0" prefWidth="108.0" text="Draw Maze" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
                         <Button layoutX="890.0" layoutY="50.0" mnemonicParsing="false" onMouseClicked="#runSimulation" prefHeight="25.0" prefWidth="120.0" text="Run Simulation" AnchorPane.rightAnchor="14.0" />
                         <Slider fx:id="slider_cell_size" layoutX="14.0" layoutY="519.0" min="30.0" onMouseDragged="#onSliderChanged" prefHeight="38.0" prefWidth="165.0" showTickLabels="true" showTickMarks="true" value="30.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" />
