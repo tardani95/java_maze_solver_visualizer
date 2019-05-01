@@ -18,20 +18,17 @@ public class Maze {
         }
     }
 
-//    public static final int RIGHT_WALL = 0;
-//    public static final int TOP_WALL = 1;
-//    public static final int LEFT_WALL = 2;
-//    public static final int BOTTOM_WALL = 3;
     private static final int X_DIR = 0;
     private static final int Y_DIR = 1;
-    private int cols;
-    private int rows;
-    Point2D start;
-    Point2D end;
-    Point2D current;
+    private int length_X;
+    private int length_Y;
 
-    int[][] walls;
-    int[][] explored_maze_walls;
+    private Point2D start;
+    private Point2D end;
+    private Point2D current;
+
+    private int[][] walls;
+    private int[][] explored_maze_walls;
 
     public Cell[][] cell;
 
@@ -48,8 +45,8 @@ public class Maze {
     }
 
     private Maze(int cols, int rows, Point2D start, Point2D end, Point2D current, Cell[][] cell) {
-        this.cols = cols;
-        this.rows = rows;
+        this.length_X = cols;
+        this.length_Y = rows;
         this.start = start;
         this.end = end;
         this.current = current;
@@ -58,20 +55,17 @@ public class Maze {
     }
 
     private void initCells() {
-        Cell c = null;
-        for (int x = 0; x < cols; x++) {
-            for (int y = 0; y < rows; y++) {
+        for (int x = 0; x < length_X; x++) {
+            for (int y = 0; y < length_Y; y++) {
                 cell[x][y] = new Cell(x, y);
                 cell[x][y].setDestination_distance((int) (new Point2D(x, y)).distanceTo(end, 0));
             }
         }
         cell[start.x][start.y].setCost(0);
-
-
     }
 
-    public void initMazeWalls() {
-        int max_size = Integer.max(cols, rows) + 1;
+    private void initMazeWalls() {
+        int max_size = Integer.max(length_X, length_Y) + 1;
         walls = new int[2][max_size];
         explored_maze_walls = new int[2][max_size];
 
@@ -149,6 +143,7 @@ public class Maze {
         return true;
     }
 
+
     public Point2D getStart() {
         return start;
     }
@@ -161,12 +156,12 @@ public class Maze {
         return current;
     }
 
-    public int getCols() {
-        return cols;
+    public int getLength_X() {
+        return length_X;
     }
 
-    public int getRows() {
-        return rows;
+    public int getLength_Y() {
+        return length_Y;
     }
 
     public int[][] getWalls() {
@@ -219,8 +214,8 @@ public class Maze {
                 System.err.println("not implemented heuristic");
                 return;
         }
-        for (int i = 0; i < cols; i++) {
-            for (int j = 0; j < rows; j++) {
+        for (int i = 0; i < length_X; i++) {
+            for (int j = 0; j < length_Y; j++) {
                 cell[i][j].setDestination_distance((int) p.distanceTo(i, j, heuristic));
             }
         }
@@ -229,8 +224,8 @@ public class Maze {
     }
 
     public void initCost() {
-        for (int i = 0; i < cols; i++) {
-            for (int j = 0; j < rows; j++) {
+        for (int i = 0; i < length_X; i++) {
+            for (int j = 0; j < length_Y; j++) {
                 cell[i][j].setCost(Integer.MAX_VALUE);
             }
         }

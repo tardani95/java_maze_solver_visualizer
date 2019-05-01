@@ -9,7 +9,7 @@ public class Cell {
     private Cell parent;
 
     public Cell() {
-        this(new Point2D(0, 0), false, Integer.MAX_VALUE, Integer.MAX_VALUE, null);
+        this(0, 0);
     }
 
     public Cell(int x, int y){
