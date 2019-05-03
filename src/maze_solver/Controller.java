@@ -2,10 +2,8 @@ package maze_solver;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Slider;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -34,39 +32,42 @@ public class Controller {
 
     private double width;
     private double height;
-    private double cell_size;
+    private double cell_size = 30.0;
 
     private static Maze maze;
     private GraphicsContext gc;
 
-    private Tab tab;
-    private Node anchorPane;
-
-    public Controller() {
-        System.out.println("Controller() called");
-    }
+//    public Controller() {
+//        System.out.println("Controller() called");
+//    }
 
     @FXML
     void initialize() {
-        System.out.println("Initialize() called");
+        System.out.println("Controller.initialize() called");
 
+        maze = Maze.getInstance();
+//        cell_size = 30.0;
 
-//        simulation_anchor_pane.
-//        mazeEditor.setContent(new Rectangle(200,200, Color.LIGHTSTEELBLUE));
+        gc = canvas_maze_editor.getGraphicsContext2D();
+        width = cell_size * maze.getLength_X();
+        height = cell_size * maze.getLength_Y();
+        canvas_maze_editor.setWidth(width);
+        canvas_maze_editor.setHeight(height);
+        gc.clearRect(0, 0, width, height);
+        drawMazeWalls(maze.getWalls(), Color.BLACK, 2);
+
 
         gc = canvas_simulation.getGraphicsContext2D();
-        maze = Maze.getInstance();
 
-        cell_size = 30.0;
 
         tabPane.widthProperty().addListener((observable, oldValue, newValue) -> {
             width = newValue.doubleValue();
-            canvas_simulation.setWidth(width / 2);
+//            canvas_simulation.setWidth(width / 2);
             drawMaze(null);
         });
         tabPane.heightProperty().addListener((observable, oldValue, newValue) -> {
             height = newValue.doubleValue();
-            canvas_simulation.setHeight(height / 2);
+//            canvas_simulation.setHeight(height / 2);
             drawMaze(null);
         });
     }
