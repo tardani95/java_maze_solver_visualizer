@@ -1,18 +1,18 @@
 package maze_solver.maze;
 
-public class Point2D {
+public class MyPoint2D {
     public int x;
     public int y;
 
-    public Point2D() {
+    public MyPoint2D() {
         this(0, 0);
     }
 
-    public Point2D(Point2D p) {
+    public MyPoint2D(MyPoint2D p) {
         this(p.x, p.y);
     }
 
-    public Point2D(int x, int y) {
+    public MyPoint2D(int x, int y) {
         this.x = x;
         this.y = y;
     }
@@ -22,15 +22,15 @@ public class Point2D {
 
         /* Check if o is an instance of Complex or not
           "null instanceof [type]" also returns false */
-        if (!(obj instanceof Point2D)) {
+        if (!(obj instanceof MyPoint2D)) {
             return false;
         }
 
-        Point2D compared = (Point2D) obj;
+        MyPoint2D compared = (MyPoint2D) obj;
         return (this.x == compared.x) && (this.y == compared.y);
     }
 
-    public double distanceTo(Point2D p2, int heuristic) {
+    public double distanceTo(MyPoint2D p2, int heuristic) {
         return distanceTo(p2.x, p2.y, heuristic);
     }
 

@@ -9,7 +9,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import maze_solver.maze.Maze;
-import maze_solver.maze.Point2D;
+import maze_solver.maze.MyPoint2D;
 import maze_solver.view.MazeView;
 
 
@@ -133,7 +133,7 @@ public class Controller {
 //        drawMazeOutline();
     }
 
-    private void drawPoint(Point2D point, Color color, double padding) {
+    private void drawPoint(MyPoint2D point, Color color, double padding) {
         gc.setFill(color);
         gc.fillRect(point.x * cell_size + padding, point.y * cell_size + padding, cell_size - 2 * padding
                 , cell_size - 2 * padding);
@@ -181,7 +181,7 @@ public class Controller {
     private void drawVisitedCells(Color color) {
         for (int x = 0; x < maze.getLength_X(); x++) {
             for (int y = 0; y < maze.getLength_Y(); y++) {
-                Point2D p = new Point2D(x, y);
+                MyPoint2D p = new MyPoint2D(x, y);
                 if(maze.cell[p.x][p.y].isVisited()){
                     drawPoint(p, color, 1);
                 }

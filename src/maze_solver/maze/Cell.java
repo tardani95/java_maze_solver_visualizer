@@ -2,10 +2,11 @@ package maze_solver.maze;
 
 public class Cell {
 
+    private boolean explored;
     private boolean visited;
     private int cost;
     private int destination_distance;
-    private Point2D coordinate;
+    private MyPoint2D coordinate;
     private Cell parent;
 
     public Cell() {
@@ -13,14 +14,14 @@ public class Cell {
     }
 
     public Cell(int x, int y){
-        this(new Point2D(x,y));
+        this(new MyPoint2D(x,y));
     }
 
-    public Cell(Point2D p) {
+    public Cell(MyPoint2D p) {
         this(p, false, Integer.MAX_VALUE, Integer.MAX_VALUE, null);
     }
 
-    public Cell(Point2D coordinate, boolean visited, int destination_distance, int cost, Cell parent) {
+    public Cell(MyPoint2D coordinate, boolean visited, int destination_distance, int cost, Cell parent) {
         this.coordinate = coordinate;
         this.visited = visited;
         this.destination_distance = destination_distance;
@@ -40,7 +41,7 @@ public class Cell {
         return destination_distance;
     }
 
-    public Point2D getCoordinate() {
+    public MyPoint2D getCoordinate() {
         return coordinate;
     }
 
@@ -64,8 +65,8 @@ public class Cell {
         this.destination_distance = destination_distance;
     }
 
-    public void setCoordinate(Point2D coordinate) {
-        this.coordinate = new Point2D(coordinate);
+    public void setCoordinate(MyPoint2D coordinate) {
+        this.coordinate = new MyPoint2D(coordinate);
     }
 
     public void setParent(Cell parent) {

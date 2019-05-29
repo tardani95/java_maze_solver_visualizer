@@ -23,9 +23,9 @@ public class Maze {
     private int length_X;
     private int length_Y;
 
-    private Point2D start;
-    private Point2D end;
-    private Point2D current;
+    private MyPoint2D start;
+    private MyPoint2D end;
+    private MyPoint2D current;
 
     private int[][] walls;
     private int[][] explored_maze_walls;
@@ -37,14 +37,14 @@ public class Maze {
     }
 
     private Maze() {
-        this(5, 4, new Point2D(0, 0), new Point2D(1, 0), null, new Cell[5][4]);
+        this(5, 4, new MyPoint2D(0, 0), new MyPoint2D(1, 0), null, new Cell[5][4]);
         initMazeWalls();
         System.out.println("initial maze created");
-        current = new Point2D(start);
+        current = new MyPoint2D(start);
         System.out.println("current point set to start point");
     }
 
-    private Maze(int cols, int rows, Point2D start, Point2D end, Point2D current, Cell[][] cell) {
+    private Maze(int cols, int rows, MyPoint2D start, MyPoint2D end, MyPoint2D current, Cell[][] cell) {
         this.length_X = cols;
         this.length_Y = rows;
         this.start = start;
@@ -58,7 +58,7 @@ public class Maze {
         for (int x = 0; x < length_X; x++) {
             for (int y = 0; y < length_Y; y++) {
                 cell[x][y] = new Cell(x, y);
-                cell[x][y].setDestination_distance((int) (new Point2D(x, y)).distanceTo(end, 0));
+                cell[x][y].setDestination_distance((int) (new MyPoint2D(x, y)).distanceTo(end, 0));
             }
         }
         cell[start.x][start.y].setCost(0);
@@ -89,7 +89,7 @@ public class Maze {
         walls[Y_DIR][0] = 0b1111;
     }
 
-    public boolean getWall(int[][] walls, Point2D point, WallType wall_type) {
+    public boolean getWall(int[][] walls, MyPoint2D point, WallType wall_type) {
         return getWall(walls, point.x, point.y, wall_type);
     }
 
@@ -113,7 +113,7 @@ public class Maze {
         }
     }
 
-    public boolean setWall(int[][] walls, Point2D point, WallType wall_type) {
+    public boolean setWall(int[][] walls, MyPoint2D point, WallType wall_type) {
         return setWall(walls, point.x, point.y, wall_type);
     }
 
@@ -144,15 +144,15 @@ public class Maze {
     }
 
 
-    public Point2D getStart() {
+    public MyPoint2D getStart() {
         return start;
     }
 
-    public Point2D getEnd() {
+    public MyPoint2D getEnd() {
         return end;
     }
 
-    public Point2D getCurrent() {
+    public MyPoint2D getCurrent() {
         return current;
     }
 
@@ -172,7 +172,11 @@ public class Maze {
         return explored_maze_walls;
     }
 
-    public void pathFind(Point2D start, Point2D end, int type, int heuristic) {
+    public Cell getCell(MyPoint2D onCoordinate){
+        return cell[onCoordinate.x][onCoordinate.y];
+    }
+
+    public void pathFind(MyPoint2D start, MyPoint2D end, int type, int heuristic) {
         if (start != null) {
             this.start = start;
         }
@@ -198,7 +202,7 @@ public class Maze {
         }
     }
 
-    public void calcDistances(Point2D p, int heuristic) {
+    public void calcDistances(MyPoint2D p, int heuristic) {
         switch (heuristic) {
             case 0: {
                 System.out.println("Euler heuristic distance calculation");
@@ -232,8 +236,8 @@ public class Maze {
         System.out.println("initial cost set to integer max value");
     }
 
-    public boolean bestDepthFirstSearch(Point2D point2D) {
-        return bestDepthFirstSearch(point2D.x, point2D.y);
+    public boolean bestDepthFirstSearch(MyPoint2D myPoint2D) {
+        return bestDepthFirstSearch(myPoint2D.x, myPoint2D.y);
     }
 
     public boolean bestDepthFirstSearch(int x, int y) {
@@ -252,7 +256,7 @@ public class Maze {
         discoverWalls(current);
 
         // calculates the following best move
-        Point2D nextPosition = calcNextPosition(current);
+        MyPoint2D nextPosition = calcNextPosition(current);
 
         // set next move cell parent
         if (!cell[nextPosition.x][nextPosition.y].isVisited()) {
@@ -269,7 +273,7 @@ public class Maze {
     }
 
 
-    public void discoverWalls(Point2D current) {
+    public void discoverWalls(MyPoint2D current) {
         for (WallType wallType : WallType.values()) {
             if (getWall(walls, current, wallType)) {
                 setWall(explored_maze_walls, current, wallType);
@@ -277,7 +281,7 @@ public class Maze {
         }
     }
 
-    private Point2D calcNextPosition(Point2D current) {
+    private MyPoint2D calcNextPosition(MyPoint2D current) {
         if (current == null) {
             return null;
         }
@@ -288,22 +292,22 @@ public class Maze {
         int currentCost = cell[current.x][current.y].getCost();
         int min_distance = 10000;
 
-        Point2D nextPosition = null;
-        Point2D p = null;
+        MyPoint2D nextPosition = null;
+        MyPoint2D p = null;
 
         for (WallType wallType : WallType.values()) {
             if (!getWall(explored_maze_walls, current, wallType)) {
                 switch (wallType) {
                     //TODO - check equality operator with doubles
                     case RIGHT_WALL: {
-                        p = new Point2D(current.x + 1, current.y);
+                        p = new MyPoint2D(current.x + 1, current.y);
                         if (cell[p.x][p.y].isVisited()) {
                             p = null;
                         }
                     }
                     break;
                     case TOP_WALL: {
-                        p = new Point2D(current.x, current.y + 1);
+                        p = new MyPoint2D(current.x, current.y + 1);
                         if (cell[p.x][p.y].isVisited()) {
                             p = null;
                         }
@@ -311,7 +315,7 @@ public class Maze {
                     break;
                     case LEFT_WALL: {
                         if (current.x > 0) {
-                            p = new Point2D(current.x - 1, current.y);
+                            p = new MyPoint2D(current.x - 1, current.y);
                             if (cell[p.x][p.y].isVisited()) {
                                 p = null;
                             }
@@ -322,7 +326,7 @@ public class Maze {
                     break;
                     case BOTTOM_WALL: {
                         if (current.y > 0) {
-                            p = new Point2D(current.x, current.y - 1);
+                            p = new MyPoint2D(current.x, current.y - 1);
                             if (cell[p.x][p.y].isVisited()) {
                                 p = null;
                             }
