@@ -12,11 +12,207 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import javafx.scene.paint.Color;
 import javafx.util.Callback;
+import maze_solver.maze.Maze;
+import maze_solver.maze.MyPoint2D;
 
 import java.util.Set;
 
 public class MazeView extends Canvas {
+
+    private Maze maze;
+    private boolean showWalls;
+    private boolean showExploredWalls;
+    private boolean showRobot;
+    private boolean showRobotOrientation;
+    private boolean showStartCell;
+    private boolean showCurrentCell;
+    private boolean showDestinationCell;
+    private boolean showVisitedCells;
+    private boolean showExploredCells;
+
+    private GraphicsContext gc = this.getGraphicsContext2D();
+    private double cell_size = 30.0;
+
+    public void setMaze(Maze maze) {
+        this.maze = maze;
+    }
+
+    public void setVisibility(boolean showWalls,
+                              boolean showExploredWalls,
+                              boolean showRobot,
+                              boolean showRobotOrientation,
+                              boolean showStartCell,
+                              boolean showCurrentCell,
+                              boolean showDestinationCell,
+                              boolean showVisitedCells,
+                              boolean showExploredCells) {
+        showWalls(showWalls);
+        showExploredWalls(showExploredWalls);
+        showRobot(showRobot);
+        showRobotOrientation(showRobotOrientation);
+        showStartCell(showStartCell);
+        showCurrentCell(showCurrentCell);
+        showDestinationCell(showDestinationCell);
+        showVisitedCells(showVisitedCells);
+        showExploredCells(showExploredCells);
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void showWalls(boolean showWalls) {
+        this.showWalls = showWalls;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void showExploredWalls(boolean showExploredWalls) {
+        this.showExploredWalls = showExploredWalls;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void showRobot(boolean showRobot) {
+        this.showRobot = showRobot;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void showRobotOrientation(boolean showRobotOrientation) {
+        this.showRobotOrientation = showRobotOrientation;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void showStartCell(boolean showStartCell) {
+        this.showStartCell = showStartCell;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void showCurrentCell(boolean showCurrentCell) {
+        this.showCurrentCell = showCurrentCell;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void showDestinationCell(boolean showDestinationCell) {
+        this.showDestinationCell = showDestinationCell;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void showVisitedCells(boolean showVisitedCells) {
+        this.showVisitedCells = showVisitedCells;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public void showExploredCells(boolean showExploredCells) {
+        this.showExploredCells = showExploredCells;
+    }
+
+    public void update() {
+        clearView();
+
+        if (showExploredCells) {
+//        drawExploredCells();
+        }
+        if (showVisitedCells) {
+            drawVisitedCells();
+        }
+        if (showStartCell) {
+//        drawStartCell();
+        }
+        if (showCurrentCell) {
+//        drawCurrentCell();
+        }
+        if (showDestinationCell) {
+//        drawDestinationCell();
+        }
+
+        if (showWalls && showExploredWalls) {
+            drawWalls(Color.RED, 1);
+            drawExploredWalls(Color.BLACK, 2);
+        }
+
+        if (showWalls && !showExploredWalls) {
+            drawWalls(Color.BLACK, 2);
+        }
+
+        if (!showWalls && showExploredWalls) {
+            drawExploredWalls(Color.BLACK, 2);
+        }
+    }
+
+    private void clearView() {
+        System.out.println("clearView()");
+        double width = cell_size * maze.getLength_X();
+        double height = cell_size * maze.getLength_Y();
+        this.setWidth(width);
+        this.setHeight(height);
+        gc.clearRect(0, 0, width, height);
+    }
+
+    private void drawRect(MyPoint2D point, Color color, double padding) {
+        gc.setFill(color);
+        gc.fillRect(point.x * cell_size + padding, point.y * cell_size + padding, cell_size - 2 * padding
+                , cell_size - 2 * padding);
+    }
+
+    private void drawVisitedCells() {
+        drawVisitedCells(Color.GRAY, 0);
+    }
+
+    private void drawVisitedCells(Color color, double padding) {
+        for (int x = 0; x < maze.getLength_X(); x++) {
+            for (int y = 0; y < maze.getLength_Y(); y++) {
+                MyPoint2D p = new MyPoint2D(x, y);
+                if (maze.getCell(p).isVisited()) {
+                    drawRect(p, color, padding);
+                }
+            }
+        }
+    }
+
+    private void drawWalls(Color wallColor, double lineWidth) {
+        drawMazeWalls(maze.getWalls(), wallColor, lineWidth);
+    }
+
+    private void drawExploredWalls(Color wallColor, double lineWidth) {
+        drawMazeWalls(maze.getExploredWalls(), wallColor, lineWidth);
+    }
+
+    private void drawMazeWalls(int[][] mazeWalls, Color color, double lineWidth) {
+        double startX;
+        double startY;
+        double stopX;
+        double stopY;
+
+        gc.setLineWidth(lineWidth);
+        gc.setStroke(color);
+        //print horizontal walls
+        for (int row_i = 0; row_i < maze.getLength_Y() + 1; row_i++) {
+            for (int coll_i = 0; coll_i < maze.getLength_X(); coll_i++) {
+
+                if ((mazeWalls[0][row_i] & (0b1 << coll_i)) > 0) {
+                    startX = coll_i * cell_size;
+                    stopX = (coll_i + 1) * cell_size;
+                    startY = row_i * cell_size;
+                    stopY = startY;
+
+                    gc.strokeLine(startX, startY, stopX, stopY);
+                }
+            }
+        }
+
+        //print vertical walls
+        for (int coll_i = 0; coll_i < maze.getLength_X() + 1; coll_i++) {
+            for (int row_i = 0; row_i < maze.getLength_Y(); row_i++) {
+
+                if ((mazeWalls[1][coll_i] & (0b1 << row_i)) > 0) {
+                    startX = coll_i * cell_size;
+                    stopX = startX;
+                    startY = row_i * cell_size;
+                    stopY = (row_i + 1) * cell_size;
+
+                    gc.strokeLine(startX, startY, stopX, stopY);
+                }
+            }
+        }
+    }
 
     public MazeView() {
         super();
