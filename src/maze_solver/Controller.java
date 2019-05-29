@@ -48,34 +48,59 @@ public class Controller {
         maze = Maze.getInstance();
 //        cell_size = 30.0;
 
-        gc = canvas_maze_editor.getGraphicsContext2D();
-        width = cell_size * maze.getLength_X();
-        height = cell_size * maze.getLength_Y();
-        canvas_maze_editor.setWidth(width);
-        canvas_maze_editor.setHeight(height);
-        gc.clearRect(0, 0, width, height);
-        drawMazeWalls(maze.getWalls(), Color.BLACK, 2);
+        canvas_maze_editor.setMaze(maze);
+        canvas_maze_editor.setVisibility(true
+                , false
+                , false
+                , false
+                , false
+                , false
+                , false
+                , false
+                , false);
+        canvas_maze_editor.refreshView();
+
+        canvas_simulation.setMaze(maze);
+        canvas_simulation.setVisibility(true
+                , true
+                , true
+                , false
+                , true
+                , true
+                , true
+                , true
+                , true);
+        canvas_simulation.refreshView();
+//        gc = canvas_maze_editor.getGraphicsContext2D();
+//        width = cell_size * maze.getLength_X();
+//        height = cell_size * maze.getLength_Y();
+//        canvas_maze_editor.setWidth(width);
+//        canvas_maze_editor.setHeight(height);
+//        gc.clearRect(0, 0, width, height);
+//        drawMazeWalls(maze.getWalls(), Color.BLACK, 2);
 
 
-        gc = canvas_simulation.getGraphicsContext2D();
+        //gc = canvas_simulation.getGraphicsContext2D();
 
 
         tabPane.widthProperty().addListener((observable, oldValue, newValue) -> {
             width = newValue.doubleValue();
 //            canvas_simulation.setWidth(width / 2);
-            drawMaze(null);
+            //drawMaze(null);
         });
         tabPane.heightProperty().addListener((observable, oldValue, newValue) -> {
             height = newValue.doubleValue();
 //            canvas_simulation.setHeight(height / 2);
-            drawMaze(null);
+            //drawMaze(null);
         });
     }
 
     public void onSliderChanged(MouseEvent mouseEvent) {
         cell_size = slider_cell_size.getValue();
-        System.out.println("Cell size changed to " + String.valueOf(cell_size) + "px");
-        drawMaze(null);
+        System.out.println("Cell size changed to " + cell_size + "px");
+        //drawMaze(null);
+        canvas_simulation.setCellSize(cell_size);
+        canvas_simulation.refreshView();
     }
 
     public void runSimulation(MouseEvent mouseEvent) {
@@ -91,7 +116,8 @@ public class Controller {
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
-                            drawMaze(null);
+                            canvas_simulation.refreshView();
+//                            drawMaze(null);
                         }
                     });
 
@@ -182,7 +208,7 @@ public class Controller {
         for (int x = 0; x < maze.getLength_X(); x++) {
             for (int y = 0; y < maze.getLength_Y(); y++) {
                 MyPoint2D p = new MyPoint2D(x, y);
-                if(maze.cell[p.x][p.y].isVisited()){
+                if (maze.cell[p.x][p.y].isVisited()) {
                     drawPoint(p, color, 1);
                 }
             }

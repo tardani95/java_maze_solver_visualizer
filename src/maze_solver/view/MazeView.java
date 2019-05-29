@@ -33,6 +33,7 @@ public class MazeView extends Canvas {
     private boolean showExploredCells;
 
     private GraphicsContext gc = this.getGraphicsContext2D();
+    private boolean gcTranslationSet = false;
     private double cell_size = 30.0;
 
     public void setMaze(Maze maze) {
@@ -104,23 +105,33 @@ public class MazeView extends Canvas {
         this.showExploredCells = showExploredCells;
     }
 
-    public void update() {
+    public void setCellSize(double cell_size) {
+        this.cell_size = cell_size;
+    }
+
+    public void setGraphicContextTranslation() {
+        if (!gcTranslationSet) {
+            gc.translate(1, 1);
+        }
+    }
+
+    public void refreshView() {
         clearView();
 
         if (showExploredCells) {
-//        drawExploredCells();
+            drawExploredCells();
         }
         if (showVisitedCells) {
             drawVisitedCells();
         }
         if (showStartCell) {
-//        drawStartCell();
+            drawStartCell();
         }
         if (showCurrentCell) {
-//        drawCurrentCell();
+            drawCurrentCell();
         }
         if (showDestinationCell) {
-//        drawDestinationCell();
+            drawDestinationCell();
         }
 
         if (showWalls && showExploredWalls) {
@@ -135,12 +146,16 @@ public class MazeView extends Canvas {
         if (!showWalls && showExploredWalls) {
             drawExploredWalls(Color.BLACK, 2);
         }
+
+        if (showRobot) {
+//        drawRobot(showRobotOrientation)
+        }
     }
 
     private void clearView() {
         System.out.println("clearView()");
-        double width = cell_size * maze.getLength_X();
-        double height = cell_size * maze.getLength_Y();
+        double width = cell_size * maze.getLength_X() + 2;
+        double height = cell_size * maze.getLength_Y() + 2;
         this.setWidth(width);
         this.setHeight(height);
         gc.clearRect(0, 0, width, height);
@@ -152,11 +167,27 @@ public class MazeView extends Canvas {
                 , cell_size - 2 * padding);
     }
 
-    private void drawVisitedCells() {
-        drawVisitedCells(Color.GRAY, 0);
+    private void drawStartCell() {
+        drawRect(maze.getStart(), Color.GREEN, 0);
     }
 
-    private void drawVisitedCells(Color color, double padding) {
+    private void drawCurrentCell() {
+        drawRect(maze.getCurrent(), Color.ALICEBLUE, cell_size / 30 * 5);
+    }
+
+    private void drawDestinationCell() {
+        drawRect(maze.getEnd(), Color.RED, 0);
+    }
+
+    private void drawVisitedCells() {
+        drawCellsStatus(Color.GRAY, 0);
+    }
+
+    private void drawExploredCells() {
+        drawCellsStatus(Color.BEIGE, 0);
+    }
+
+    private void drawCellsStatus(Color color, double padding) {
         for (int x = 0; x < maze.getLength_X(); x++) {
             for (int y = 0; y < maze.getLength_Y(); y++) {
                 MyPoint2D p = new MyPoint2D(x, y);
