@@ -49,4 +49,13 @@ public class MyPoint2D {
         }
 
     }
+
+    public void modifyCoordinates(MyPoint2D p){
+        modifyCoordinates(p.x,p.y);
+    }
+
+    public void modifyCoordinates(int x, int y){
+        this.x = x;
+        this.y = y;
+    }
 }

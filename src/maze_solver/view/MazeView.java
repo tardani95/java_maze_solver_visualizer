@@ -11,6 +11,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
@@ -153,7 +154,7 @@ public class MazeView extends Canvas {
     }
 
     private void clearView() {
-        System.out.println("clearView()");
+//        System.out.println("clearView()");
         double width = cell_size * maze.getLength_X() + 2;
         double height = cell_size * maze.getLength_Y() + 2;
         this.setWidth(width);
@@ -244,6 +245,48 @@ public class MazeView extends Canvas {
             }
         }
     }
+
+    public void setStartCellCoordinates(int x, int y) {
+        maze.getStart().modifyCoordinates(x, y);
+        maze.getCurrent().modifyCoordinates(x, y);
+    }
+
+    public void setEndCellCoordinates(int x, int y) {
+        maze.getEnd().modifyCoordinates(x, y);
+    }
+
+    public boolean isStartCell(MyPoint2D cell) {
+        return maze.getStart().equals(cell);
+    }
+
+    public boolean isEndCell(MyPoint2D cell) {
+        return maze.getEnd().equals(cell);
+    }
+
+    public int validateMouseX(MouseEvent mouseEvent) {
+        int max_x = maze.getLength_X() - 1;
+        int x = (int) (mouseEvent.getX() / cell_size);
+        if (x < 0) {
+            x = 0;
+        }
+        if (x > max_x) {
+            x = max_x;
+        }
+        return x;
+    }
+
+    public int validateMouseY(MouseEvent mouseEvent) {
+        int max_y = maze.getLength_Y() - 1;
+        int y = (int) (mouseEvent.getY() / cell_size);
+        if (y < 0) {
+            y = 0;
+        }
+        if (y > max_y) {
+            y = max_y;
+        }
+        return y;
+    }
+
 
     public MazeView() {
         super();

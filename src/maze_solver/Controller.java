@@ -1,14 +1,18 @@
 package maze_solver;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import maze_solver.maze.Maze;
+import maze_solver.maze.MyPoint2D;
 import maze_solver.view.MazeView;
 
 
@@ -33,13 +37,21 @@ public class Controller {
     Slider slider_simulation_cell_size;
 
 
-
     private double width;
     private double height;
     private double cell_size = 30.0;
 
     private static Maze maze;
     private GraphicsContext gc;
+
+    private enum SelectedCell {
+        none,
+        start_cell,
+        end_cell
+    }
+
+    private SelectedCell selectedCell = SelectedCell.none;
+//    private MazeView mazeView;
 
 //    public Controller() {
 //        System.out.println("Controller() called");
@@ -57,7 +69,7 @@ public class Controller {
                 , false
                 , false
                 , false
-                , false
+                , true
                 , false
                 , false
                 , false
@@ -77,17 +89,22 @@ public class Controller {
                 , true);
         canvas_simulation.setGraphicContextTranslation();
         canvas_simulation.refreshView();
-//        gc = canvas_maze_editor.getGraphicsContext2D();
-//        width = cell_size * maze.getLength_X();
-//        height = cell_size * maze.getLength_Y();
-//        canvas_maze_editor.setWidth(width);
-//        canvas_maze_editor.setHeight(height);
-//        gc.clearRect(0, 0, width, height);
-//        drawMazeWalls(maze.getWalls(), Color.BLACK, 2);
 
-
-        //gc = canvas_simulation.getGraphicsContext2D();
-
+        tabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
+            @Override
+            public void changed(ObservableValue<? extends Tab> observable, Tab oldValue, Tab newValue) {
+                switch (newValue.getId()) {
+                    case "tab_maze_editor":
+                        canvas_maze_editor.refreshView();
+                        break;
+                    case "tab_simulation":
+                        canvas_simulation.refreshView();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
 
         tabPane.widthProperty().addListener((observable, oldValue, newValue) -> {
             width = newValue.doubleValue();
@@ -145,4 +162,65 @@ public class Controller {
         canvas_maze_editor.setCellSize(slider_maze_editor_cell_size.getValue());
         canvas_maze_editor.refreshView();
     }
+
+    private void onDragDetected(MazeView mazeView, MouseEvent mouseEvent) {
+        selectedCell = SelectedCell.none;
+        int x = mazeView.validateMouseX(mouseEvent);
+        int y = mazeView.validateMouseY(mouseEvent);
+        MyPoint2D cell = new MyPoint2D(x, y);
+        if (mazeView.isStartCell(cell)) {
+            selectedCell = SelectedCell.start_cell;
+        }
+
+        if (mazeView.isEndCell(cell)) {
+            selectedCell = SelectedCell.end_cell;
+        }
+    }
+
+    public void onDragDetectedMazeEditor(MouseEvent mouseEvent) {
+        onDragDetected(canvas_maze_editor, mouseEvent);
+
+    }
+
+    public void onDragDetectedSimulation(MouseEvent mouseEvent) {
+        onDragDetected(canvas_simulation, mouseEvent);
+    }
+
+    private void onDrag(MazeView mazeView, MouseEvent mouseEvent) {
+        int x = mazeView.validateMouseX(mouseEvent);
+        int y = mazeView.validateMouseY(mouseEvent);
+        switch (selectedCell) {
+            case start_cell:
+                if (mazeView.isEndCell(new MyPoint2D(x, y))) {
+                    // do nothing
+                } else {
+                    mazeView.setStartCellCoordinates(x, y);
+                    System.out.print("Start set to: ");
+                    System.out.println(x + "," + y);
+                }
+
+                break;
+            case end_cell:
+                if (mazeView.isStartCell(new MyPoint2D(x, y))) {
+                    // do nothing
+                } else {
+                    mazeView.setEndCellCoordinates(x, y);
+                    System.out.print("End set to: ");
+                    System.out.println(x + "," + y);
+                }
+                break;
+            default:
+                break;
+        }
+        mazeView.refreshView();
+    }
+
+    public void onDragMazeEditor(MouseEvent mouseEvent) {
+        onDrag(canvas_maze_editor, mouseEvent);
+    }
+
+    public void onDragSimulation(MouseEvent mouseEvent) {
+        onDrag(canvas_simulation, mouseEvent);
+    }
+
 }
