@@ -14,13 +14,13 @@
 <?import javafx.scene.text.Text?>
 <?import maze_solver.view.MazeView?>
 
-<TabPane fx:id="tabPane" minHeight="576.0" minWidth="734.0" prefHeight="576.0" prefWidth="734.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="maze_solver.Controller">
+<TabPane fx:id="tabPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="576.0" minWidth="734.0" prefHeight="576.0" prefWidth="734.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="maze_solver.Controller">
     <tabs>
         <Tab text="MazeEditor">
             <content>
-                <HBox>
+                <HBox fillHeight="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                     <children>
-                        <VBox prefHeight="543.0" prefWidth="770.0">
+                        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="543.0" prefWidth="770.0">
                             <children>
                                 <AnchorPane fx:id="maze_editor_anchor_pane" minHeight="0.0" minWidth="0.0" prefHeight="543.0" prefWidth="563.0" VBox.vgrow="NEVER">
                                     <children>
@@ -35,7 +35,7 @@
                                 </AnchorPane>
                             </children>
                         </VBox>
-                        <VBox prefHeight="200.0" prefWidth="100.0">
+                        <VBox maxHeight="1.7976931348623157E308" prefHeight="200.0" prefWidth="100.0">
                             <children>
                                 <AnchorPane maxWidth="320.0" minWidth="255.0" prefWidth="255.0">
                                     <children>
@@ -53,7 +53,7 @@
         </Tab>
         <Tab text="Simulation">
             <content>
-                <AnchorPane fx:id="simulation_anchor_pane" minHeight="0.0" minWidth="0.0">
+                <AnchorPane fx:id="simulation_anchor_pane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0">
                     <children>
                         <MazeView fx:id="canvas_simulation" height="282.0" layoutX="14.0" layoutY="14.0" rotate="180.0" width="504.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0">
                             <rotationAxis>

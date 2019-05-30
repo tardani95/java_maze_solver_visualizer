@@ -127,20 +127,20 @@ public class MazeView extends Canvas {
         if (showStartCell) {
             drawStartCell();
         }
-        if (showCurrentCell) {
-            drawCurrentCell();
-        }
         if (showDestinationCell) {
             drawDestinationCell();
         }
-
-        if (showWalls && showExploredWalls) {
-            drawWalls(Color.RED, 1);
-            drawExploredWalls(Color.BLACK, 2);
+        if (showCurrentCell) {
+            drawCurrentCell();
         }
 
-        if (showWalls && !showExploredWalls) {
-            drawWalls(Color.BLACK, 2);
+        if (showWalls && showExploredWalls) {
+            drawWalls(Color.RED, 2);
+            drawExploredWalls(Color.BLACK, 3);
+        }
+
+        if (showWalls && (!showExploredWalls)) {
+            drawWalls(Color.BLACK, 1);
         }
 
         if (!showWalls && showExploredWalls) {
@@ -168,15 +168,15 @@ public class MazeView extends Canvas {
     }
 
     private void drawStartCell() {
-        drawRect(maze.getStart(), Color.GREEN, 0);
+        drawRect(maze.getStart(), Color.GREENYELLOW, 0);
     }
 
     private void drawCurrentCell() {
-        drawRect(maze.getCurrent(), Color.ALICEBLUE, cell_size / 30 * 5);
+        drawRect(maze.getCurrent(), Color.GREEN, cell_size / 30 * 5);
     }
 
     private void drawDestinationCell() {
-        drawRect(maze.getEnd(), Color.RED, 0);
+        drawRect(maze.getEnd(), Color.ORANGERED, 0);
     }
 
     private void drawVisitedCells() {
