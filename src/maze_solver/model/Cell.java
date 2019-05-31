@@ -3,14 +3,14 @@ package maze_solver.model;
 import static java.lang.Math.*;
 
 public class Cell {
-    private int x;
-    private int y;
+    protected int x;
+    protected int y;
 
     private boolean explored;
     private boolean visited;
     private double cost;
     private double destination_distance;
-    private CellType type;
+    protected CellType type;
     private Cell parent;
 
     /*******CONSTRUCTORS*******/
@@ -141,7 +141,7 @@ public class Cell {
         return distanceTo(c, Heuristic.EUCLIDEAN);
     }
 
-    public boolean modifyX(int x){
+    private boolean modifyX(int x){
         boolean success = false;
         if(!isCellType(CellType.DEFAULT)){
             this.x = x;
@@ -149,7 +149,7 @@ public class Cell {
         }
         return success;
     }
-    public boolean modifyY(int y){
+    private boolean modifyY(int y){
         boolean success = false;
         if(!isCellType(CellType.DEFAULT)){
             this.y = y;
@@ -158,7 +158,7 @@ public class Cell {
         return success;
     }
 
-    public void modifyXY(int x, int y){
+    protected void modifyXY(int x, int y){
         if(modifyX(x) & modifyY(y)){
             System.out.println(type.name()+" coordinates modified");
         }
@@ -171,6 +171,7 @@ public class Cell {
 
     public enum CellType {
         DEFAULT,
+        CURRENT,
         START,
         DESTINATION
     }
