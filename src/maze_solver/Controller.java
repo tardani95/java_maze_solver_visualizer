@@ -50,7 +50,7 @@ public class Controller {
         end_cell
     }
 
-    private SelectedCell selectedCell = SelectedCell.none;
+    private volatile SelectedCell selectedCell = SelectedCell.none;
 //    private MazeView mazeView;
 
 //    public Controller() {
@@ -209,7 +209,8 @@ public class Controller {
                     System.out.println(x + "," + y);
                 }
                 break;
-            default:
+            case none:
+                System.out.println("none is selected");
                 break;
         }
         mazeView.refreshView();
