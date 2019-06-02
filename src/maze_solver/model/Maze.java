@@ -1,36 +1,69 @@
 package maze_solver.model;
 
-public class Maze {
+import com.sun.istack.internal.NotNull;
 
+import java.util.Random;
+
+public class Maze {
+    /**
+     * maximum maze side length in micromouse competition
+     * [0:32)
+     */
+    private static final int MAX_SIZE = 32;
     private static final int X_DIR = 0;
     private static final int Y_DIR = 1;
+    private static final int DIR_SIZE = 2;
     private int length_X;
     private int length_Y;
 
     private StartCell start;
-    private DestinationCell destination;
+    private StartCell generationStart;
+    private GoalCell goal;
     private CurrentCell current;
 
     private int[][] walls;
     private int[][] explored_maze_walls;
 
-    private Cell[][] cell;
+    private Cell[][] cells;
+
+    /*******CONSTRUCTORS*******/
+
+    public Maze(int length_X, int length_Y, StartCell generationStart, int[][] walls) {
+        if (length_X > MAX_SIZE || length_Y > MAX_SIZE) {
+            length_X = MAX_SIZE;
+            length_Y = MAX_SIZE;
+        }
+        this.length_X = length_X;
+        this.length_Y = length_Y;
+
+        if( generationStart == null){
+            Random rand = new Random();
+            this.generationStart = new StartCell(rand.nextInt(length_X), rand.nextInt(length_Y));
+        }else {
+            this.generationStart = generationStart;
+        }
+        this.walls = walls;
+    }
+
+    public Maze(int cols, int rows){
+
+    }
 
     public Maze() {
-        this(5, 4, new StartCell(0, 0), new DestinationCell(1, 0), new CurrentCell(0,0), new Cell[5][4]);
+        this(5, 4, new StartCell(0, 0), new GoalCell(1, 0), new CurrentCell(0, 0), new Cell[5][4]);
         initMazeWalls();
         System.out.println("initial maze created");
         current.setCoordinatesToCell(start);
         System.out.println("current point set to start point");
     }
 
-    private Maze(int cols, int rows, StartCell start, DestinationCell destination, CurrentCell current, Cell[][] cell) {
+    public Maze(int cols, int rows, @NotNull StartCell start, @NotNull GoalCell goal, @NotNull CurrentCell current, Cell[][] cells) {
         this.length_X = cols;
         this.length_Y = rows;
         this.start = start;
-        this.destination = destination;
+        this.goal = goal;
         this.current = current;
-        this.cell = cell;
+        this.cells = cells;
         initCells();
     }
 
@@ -38,15 +71,15 @@ public class Maze {
         Cell c;
         for (int x = 0; x < length_X; x++) {
             for (int y = 0; y < length_Y; y++) {
-                c = cell[x][y] = new Cell(x, y);
-                c.setDestination_distance(c.distanceTo(destination));
+                c = cells[x][y] = new Cell(x, y);
+                c.setDestination_distance(c.distanceTo(goal));
             }
         }
-        cell[start.x][start.y].setCost(0);
+        cells[start.x][start.y].setCost(0);
     }
 
     private void initMazeWalls() {
-        int max_size = Integer.max(length_X, length_Y) + 1;
+        int max_size = getWallsMaxSize(length_X, length_Y);
         walls = new int[2][max_size];
         explored_maze_walls = new int[2][max_size];
 
@@ -129,8 +162,8 @@ public class Maze {
         return start;
     }
 
-    public Cell getDestination() {
-        return destination;
+    public Cell getGoal() {
+        return goal;
     }
 
     public Cell getCurrent() {
@@ -154,15 +187,15 @@ public class Maze {
     }
 
     public Cell getCell(Cell onCoordinate) {
-        return cell[onCoordinate.x][onCoordinate.y];
+        return cells[onCoordinate.x][onCoordinate.y];
     }
 
-    public void pathFind(StartCell start, DestinationCell end, int type, Heuristic heuristic) {
+    public void pathFind(StartCell start, GoalCell end, int type, Heuristic heuristic) {
         if (start != null) {
             this.start = start;
         }
         if (end != null) {
-            this.destination = end;
+            this.goal = end;
         }
 
         calcDistances(end, heuristic);
@@ -201,7 +234,7 @@ public class Maze {
         }
         for (int i = 0; i < length_X; i++) {
             for (int j = 0; j < length_Y; j++) {
-                cell[i][j].setDestination_distance((int) p.distanceTo(i, j, heuristic));
+                cells[i][j].setDestination_distance((int) p.distanceTo(i, j, heuristic));
             }
         }
         System.out.println("distances calculated");
@@ -211,7 +244,7 @@ public class Maze {
     public void initCost() {
         for (int i = 0; i < length_X; i++) {
             for (int j = 0; j < length_Y; j++) {
-                cell[i][j].setCost(Integer.MAX_VALUE);
+                cells[i][j].setCost(Integer.MAX_VALUE);
             }
         }
         System.out.println("initial cost set to integer max value");
@@ -226,10 +259,10 @@ public class Maze {
         current.y = y;
 
         // set actual node as visited
-        cell[current.x][current.y].setVisited();
+        cells[current.x][current.y].setVisited();
 
-        // if destination point reached then terminate
-        if (current.equals(destination)) {
+        // if goal point reached then terminate
+        if (current.equals(goal)) {
             return true;
         }
 
@@ -239,9 +272,9 @@ public class Maze {
         // calculates the following best move
         Cell nextPosition = calcNextPosition(current);
 
-        // set next move cell parent
-        if (!cell[nextPosition.x][nextPosition.y].isVisited()) {
-            cell[nextPosition.x][nextPosition.y].setParent(cell[current.x][current.y]);
+        // set next move cells parent
+        if (!cells[nextPosition.x][nextPosition.y].isVisited()) {
+            cells[nextPosition.x][nextPosition.y].setParent(cells[current.x][current.y]);
         }
 
         /*try*/
@@ -249,7 +282,7 @@ public class Maze {
         current.y = nextPosition.y;
         return false;
 
-        /*destination of try*/
+        /*goal of try*/
 //        return bestDepthFirstSearch(nextPosition);
     }
 
@@ -266,11 +299,11 @@ public class Maze {
         if (current == null) {
             return null;
         }
-        if (current.equals(destination)) {
-            return destination;
+        if (current.equals(goal)) {
+            return goal;
         }
 
-        double currentCost = cell[current.x][current.y].getCost();
+        double currentCost = cells[current.x][current.y].getCost();
         double min_distance = 10000;
 
         Cell nextPosition = null;
@@ -282,14 +315,14 @@ public class Maze {
                     //TODO - check equality operator with doubles
                     case RIGHT_WALL: {
                         p = new Cell(current.x + 1, current.y);
-                        if (cell[p.x][p.y].isVisited()) {
+                        if (cells[p.x][p.y].isVisited()) {
                             p = null;
                         }
                     }
                     break;
                     case TOP_WALL: {
                         p = new Cell(current.x, current.y + 1);
-                        if (cell[p.x][p.y].isVisited()) {
+                        if (cells[p.x][p.y].isVisited()) {
                             p = null;
                         }
                     }
@@ -297,7 +330,7 @@ public class Maze {
                     case LEFT_WALL: {
                         if (current.x > 0) {
                             p = new Cell(current.x - 1, current.y);
-                            if (cell[p.x][p.y].isVisited()) {
+                            if (cells[p.x][p.y].isVisited()) {
                                 p = null;
                             }
                         } else {
@@ -308,7 +341,7 @@ public class Maze {
                     case BOTTOM_WALL: {
                         if (current.y > 0) {
                             p = new Cell(current.x, current.y - 1);
-                            if (cell[p.x][p.y].isVisited()) {
+                            if (cells[p.x][p.y].isVisited()) {
                                 p = null;
                             }
                         } else {
@@ -320,26 +353,48 @@ public class Maze {
                         break;
                 }
                 if (p != null) {
-                    if (cell[p.x][p.y].getCost() > (currentCost + 1)) {
-                        cell[p.x][p.y].setCost(currentCost + 1);
-                        cell[p.x][p.y].setParent(cell[current.x][current.y]);
+                    if (cells[p.x][p.y].getCost() > (currentCost + 1)) {
+                        cells[p.x][p.y].setCost(currentCost + 1);
+                        cells[p.x][p.y].setParent(cells[current.x][current.y]);
                     }
 
-                    if (cell[p.x][p.y].getDestination_distance() < min_distance) {
+                    if (cells[p.x][p.y].getDestination_distance() < min_distance) {
                         nextPosition = p;
-                        min_distance = cell[p.x][p.y].getDestination_distance();
+                        min_distance = cells[p.x][p.y].getDestination_distance();
                     }
                 }
             }
         }
 
         if (nextPosition == null) {
-            return cell[current.x][current.y].getParent();
+            return cells[current.x][current.y].getParent();
         }
 
 
         return nextPosition;
     }
+
+    /*******GETTERS AND SETTERS*******/
+
+
+    private int getWallsMaxSize(int cols, int rows) {
+        return Integer.max(cols, rows) + 1;
+    }
+    /*******OVERRIDDEN FUNCTIONS*******/
+    /*******FUNCTIONS*******/
+
+    private int[][] generateWallArray(int cols, int rows) {
+        int[][] walls = new int[DIR_SIZE][getWallsMaxSize(cols, rows)];
+        for (int i = 0; i < cols; i++) {
+            setWall(walls, i, 0, WallType.BOTTOM_WALL);
+            setWall(walls, i, rows - 1, WallType.TOP_WALL);
+            setWall(walls, 0, i, WallType.LEFT_WALL);
+            setWall(walls, cols - 1, i, WallType.RIGHT_WALL);
+        }
+        return walls;
+    }
+
+    /*******ENUMS*******/
 
     public enum WallType {
         RIGHT_WALL(0),
