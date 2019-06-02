@@ -11,7 +11,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("main_layout.fxml"));
-        primaryStage.setTitle("Hello World");
+        primaryStage.setTitle("Maze Visualizer");
         Scene myScene = new Scene(root, 1024, 576);
         primaryStage.setScene(myScene);
         primaryStage.setMinWidth(1024);

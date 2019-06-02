@@ -9,6 +9,9 @@ public class Cell {
     private boolean explored;
     private boolean visited;
     private double cost;
+    /**
+     * can be removed and calculated during the path finding algorithms
+     */
     private double destination_distance;
     protected CellType type;
     private Cell parent;

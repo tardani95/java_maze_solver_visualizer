@@ -177,7 +177,7 @@ public class MazeView extends Canvas {
     }
 
     private void drawDestinationCell() {
-        drawRect(maze.getDestination(), Color.ORANGERED, 0);
+        drawRect(maze.getGoal(), Color.ORANGERED, 0);
     }
 
     private void drawVisitedCells() {
@@ -252,7 +252,7 @@ public class MazeView extends Canvas {
     }
 
     public void setEndCellCoordinates(int x, int y) {
-        maze.getDestination().modifyXY(x, y);
+        maze.getGoal().modifyXY(x, y);
     }
 
     public boolean isStartCell(Cell cell) {
@@ -260,7 +260,7 @@ public class MazeView extends Canvas {
     }
 
     public boolean isEndCell(Cell cell) {
-        return maze.getDestination().equals(cell);
+        return maze.getGoal().equals(cell);
     }
 
     public int validateMouseX(MouseEvent mouseEvent) {
