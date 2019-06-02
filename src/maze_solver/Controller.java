@@ -11,8 +11,8 @@ import javafx.scene.control.TabPane;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import maze_solver.maze.Maze;
-import maze_solver.maze.MyPoint2D;
+import maze_solver.model.Cell;
+import maze_solver.model.Maze;
 import maze_solver.view.MazeView;
 
 
@@ -61,7 +61,7 @@ public class Controller {
     void initialize() {
         System.out.println("Controller.initialize() called");
 
-        maze = Maze.getInstance();
+        maze = new Maze();
 //        cell_size = 30.0;
 
         canvas_maze_editor.setMaze(maze);
@@ -167,7 +167,7 @@ public class Controller {
         selectedCell = SelectedCell.none;
         int x = mazeView.validateMouseX(mouseEvent);
         int y = mazeView.validateMouseY(mouseEvent);
-        MyPoint2D cell = new MyPoint2D(x, y);
+        Cell cell = new Cell(x, y);
         if (mazeView.isStartCell(cell)) {
             selectedCell = SelectedCell.start_cell;
         }
@@ -191,7 +191,7 @@ public class Controller {
         int y = mazeView.validateMouseY(mouseEvent);
         switch (selectedCell) {
             case start_cell:
-                if (mazeView.isEndCell(new MyPoint2D(x, y))) {
+                if (mazeView.isEndCell(new Cell(x, y))) {
                     // do nothing
                 } else {
                     mazeView.setStartCellCoordinates(x, y);
@@ -201,7 +201,7 @@ public class Controller {
 
                 break;
             case end_cell:
-                if (mazeView.isStartCell(new MyPoint2D(x, y))) {
+                if (mazeView.isStartCell(new Cell(x, y))) {
                     // do nothing
                 } else {
                     mazeView.setEndCellCoordinates(x, y);

@@ -15,8 +15,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.paint.Color;
 import javafx.util.Callback;
-import maze_solver.maze.Maze;
-import maze_solver.maze.MyPoint2D;
+import maze_solver.model.Cell;
+import maze_solver.model.Maze;
 
 import java.util.Set;
 
@@ -162,9 +162,9 @@ public class MazeView extends Canvas {
         gc.clearRect(0, 0, width, height);
     }
 
-    private void drawRect(MyPoint2D point, Color color, double padding) {
+    private void drawRect(Cell point, Color color, double padding) {
         gc.setFill(color);
-        gc.fillRect(point.x * cell_size + padding, point.y * cell_size + padding, cell_size - 2 * padding
+        gc.fillRect(point.getX() * cell_size + padding, point.getY() * cell_size + padding, cell_size - 2 * padding
                 , cell_size - 2 * padding);
     }
 
@@ -177,7 +177,7 @@ public class MazeView extends Canvas {
     }
 
     private void drawDestinationCell() {
-        drawRect(maze.getEnd(), Color.ORANGERED, 0);
+        drawRect(maze.getDestination(), Color.ORANGERED, 0);
     }
 
     private void drawVisitedCells() {
@@ -191,7 +191,7 @@ public class MazeView extends Canvas {
     private void drawCellsStatus(Color color, double padding) {
         for (int x = 0; x < maze.getLength_X(); x++) {
             for (int y = 0; y < maze.getLength_Y(); y++) {
-                MyPoint2D p = new MyPoint2D(x, y);
+                Cell p = new Cell(x, y);
                 if (maze.getCell(p).isVisited()) {
                     drawRect(p, color, padding);
                 }
@@ -247,20 +247,20 @@ public class MazeView extends Canvas {
     }
 
     public void setStartCellCoordinates(int x, int y) {
-        maze.getStart().modifyCoordinates(x, y);
-        maze.getCurrent().modifyCoordinates(x, y);
+        maze.getStart().modifyXY(x, y);
+        maze.getCurrent().modifyXY(x, y);
     }
 
     public void setEndCellCoordinates(int x, int y) {
-        maze.getEnd().modifyCoordinates(x, y);
+        maze.getDestination().modifyXY(x, y);
     }
 
-    public boolean isStartCell(MyPoint2D cell) {
+    public boolean isStartCell(Cell cell) {
         return maze.getStart().equals(cell);
     }
 
-    public boolean isEndCell(MyPoint2D cell) {
-        return maze.getEnd().equals(cell);
+    public boolean isEndCell(Cell cell) {
+        return maze.getDestination().equals(cell);
     }
 
     public int validateMouseX(MouseEvent mouseEvent) {

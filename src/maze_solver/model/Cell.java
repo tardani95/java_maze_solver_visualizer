@@ -24,6 +24,7 @@ public class Cell {
         this.visited = visited;
         this.cost = cost;
         this.destination_distance = destination_distance;
+        this.type = cellType;
         this.parent = parent;
     }
 
@@ -122,48 +123,71 @@ public class Cell {
     }
 
 
+    /*******OVERRIDDEN FUNCTIONS*******/
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null){
+            return false;
+        }
+
+        Cell c;
+
+        if(obj instanceof Cell){
+            c = (Cell) obj;
+        }else{
+            return false;
+        }
+
+        return (this.x == c.x && this.y == c.y);
+    }
+
     /*******FUNCTIONS*******/
 
 
-    public double distanceTo(Cell c, Heuristic h) {
+    public double distanceTo(int x, int y, Heuristic h) {
         switch (h) {
             case MANHATTAN:
-                return abs(this.x - c.x) + abs(this.y - c.y);
+                return abs(this.x - x) + abs(this.y - y);
             case EUCLIDEAN:
-                return sqrt(pow(this.x - c.x, 2) + pow(this.y - c.y, 2));
+                return sqrt(pow(this.x - x, 2) + pow(this.y - y, 2));
             default:
                 System.err.println(h.name() + " distance heuristic not implemented, returning -1.0");
                 return -1.0;
         }
     }
 
+    public double distanceTo(Cell c, Heuristic h){
+        return distanceTo(c.x,c.y,h);
+    }
+
     public double distanceTo(Cell c) {
         return distanceTo(c, Heuristic.EUCLIDEAN);
     }
 
-    private boolean modifyX(int x){
+    private boolean modifyX(int x) {
         boolean success = false;
-        if(!isCellType(CellType.DEFAULT)){
+        if (!isCellType(CellType.DEFAULT)) {
             this.x = x;
-            success= true;
+            success = true;
         }
         return success;
     }
-    private boolean modifyY(int y){
+
+    private boolean modifyY(int y) {
         boolean success = false;
-        if(!isCellType(CellType.DEFAULT)){
+        if (!isCellType(CellType.DEFAULT)) {
             this.y = y;
             success = true;
         }
         return success;
     }
 
-    protected void modifyXY(int x, int y){
-        if(modifyX(x) & modifyY(y)){
-            System.out.println(type.name()+" coordinates modified");
+    public void modifyXY(int x, int y) {
+        if (modifyX(x) & modifyY(y)) {
+            System.out.println(type.name() + " coordinates modified");
         }
     }
-
 
 
 
