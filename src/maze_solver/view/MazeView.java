@@ -41,7 +41,7 @@ public class MazeView extends Canvas {
         this.maze = maze;
     }
 
-    public Maze getMaze(){
+    public Maze getMaze() {
         return maze;
     }
 
@@ -158,12 +158,12 @@ public class MazeView extends Canvas {
     }
 
     private void clearView() {
-//        System.out.println("clearView()");
+////        System.out.println("clearView()");
         double width = cell_size * maze.getLength_X() + 2;
         double height = cell_size * maze.getLength_Y() + 2;
         this.setWidth(width);
         this.setHeight(height);
-        gc.clearRect(0, 0, width, height);
+        gc.clearRect(0, 0, widthProperty().doubleValue(), heightProperty().doubleValue());
     }
 
     private void drawRect(Cell point, Color color, double padding) {
@@ -257,20 +257,32 @@ public class MazeView extends Canvas {
     }
 
     public void setStartCellCoordinates(int x, int y) {
-        maze.getStart().modifyXY(x, y);
-        maze.getCurrent().modifyXY(x, y);
+        if (maze.getStart() != null) {
+            maze.getStart().modifyXY(x, y);
+        }
+        if(maze.getCurrent() != null){
+            maze.getCurrent().modifyXY(x, y);
+        }
     }
 
     public void setEndCellCoordinates(int x, int y) {
-        maze.getGoal().modifyXY(x, y);
+        if (maze.getGoal() != null) {
+            maze.getGoal().modifyXY(x, y);
+        }
     }
 
     public boolean isStartCell(Cell cell) {
-        return maze.getStart().equals(cell);
+        if (maze.getStart() != null) {
+            return maze.getStart().equals(cell);
+        }
+        return false;
     }
 
     public boolean isEndCell(Cell cell) {
-        return maze.getGoal().equals(cell);
+        if (maze.getGoal() != null) {
+            return maze.getGoal().equals(cell);
+        }
+        return false;
     }
 
     public int validateMouseX(MouseEvent mouseEvent) {
