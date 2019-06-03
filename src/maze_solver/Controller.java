@@ -161,8 +161,6 @@ public class Controller {
             //drawMaze(null);
         });
 
-        tf_x_size.setTextFormatter(newTextFieldFormatter());
-        tf_y_size.setTextFormatter(newTextFieldFormatter());
         tf_x_size.textProperty().addListener(newTextFieldInputValidationChangeListener(tf_x_size));
         tf_y_size.textProperty().addListener(newTextFieldInputValidationChangeListener(tf_y_size));
     }
@@ -172,13 +170,13 @@ public class Controller {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
                 if (newValue != null && !newValue.equals("")) {
-//                    if (!(newValue.matches("\\d+(\\.\\d+)?"))) {
-//                        tf_x_size.textProperty().setValue(oldValue);
-//                    }else{
-                    if (Integer.valueOf(newValue) > MAX_MAZE_SIZE) {
-                        textField.textProperty().setValue(String.valueOf(MAX_MAZE_SIZE));
+                    if (!(newValue.matches("\\d+(\\.\\d+)?"))) {
+                        tf_x_size.textProperty().setValue(oldValue);
+                    } else {
+                        if (Integer.valueOf(newValue) > MAX_MAZE_SIZE) {
+                            textField.textProperty().setValue(String.valueOf(MAX_MAZE_SIZE));
+                        }
                     }
-//                    }
                 }
             }
         };
