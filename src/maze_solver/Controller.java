@@ -1,24 +1,44 @@
 package maze_solver;
 
+import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Slider;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.input.InputEvent;
+import javafx.scene.input.InputMethodEvent;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import maze_solver.maze.Maze;
-import maze_solver.maze.MyPoint2D;
+import maze_solver.model.Cell;
+import maze_solver.model.Maze;
 import maze_solver.view.MazeView;
+
+import java.text.DecimalFormat;
+import java.text.ParsePosition;
+
+import static maze_solver.model.Maze.MAX_MAZE_SIZE;
 
 
 public class Controller {
+
+    @FXML
+    JFXTextField tf_x_size;
+
+    @FXML
+    JFXTextField tf_y_size;
+
+    @FXML
+    Button btn_generate_maze;
+
+
     @FXML
     TabPane tabPane;
+
     @FXML
     MazeView canvas_maze_editor;
     @FXML
@@ -44,6 +64,30 @@ public class Controller {
     private static Maze maze;
     private GraphicsContext gc;
 
+    public void onBtnGenerateMazePressed(ActionEvent actionEvent) {
+
+    }
+
+    public void onInputTextChanged(InputMethodEvent inputMethodEvent) {
+        System.out.println(inputMethodEvent.getSource());
+    }
+
+    public void onTfKeyTyped(KeyEvent keyEvent) {
+//        Object o = keyEvent.getSource();
+//        JFXTextField textField;
+//        if (o instanceof JFXTextField) {
+//            textField = (JFXTextField) o;
+//            String newText = textField.getText();
+//            if (newText != null && !newText.equals("")) {
+//                System.out.println(newText);
+//                if (Integer.valueOf(newText) > MAX_MAZE_SIZE) {
+//                    textField.setText(String.valueOf(MAX_MAZE_SIZE));
+//                }
+//            }
+//
+//        }
+    }
+
     private enum SelectedCell {
         none,
         start_cell,
@@ -61,7 +105,7 @@ public class Controller {
     void initialize() {
         System.out.println("Controller.initialize() called");
 
-        maze = Maze.getInstance();
+        maze = new Maze(6, 6);
 //        cell_size = 30.0;
 
         canvas_maze_editor.setMaze(maze);
@@ -77,7 +121,7 @@ public class Controller {
         canvas_maze_editor.setGraphicContextTranslation();
         canvas_maze_editor.refreshView();
 
-        canvas_simulation.setMaze(maze);
+        canvas_simulation.setMaze(new Maze());
         canvas_simulation.setVisibility(true
                 , true
                 , true
@@ -116,6 +160,45 @@ public class Controller {
 //            canvas_simulation.setHeight(height / 2);
             //drawMaze(null);
         });
+
+        tf_x_size.textProperty().addListener(newTextFieldInputValidationChangeListener(tf_x_size));
+        tf_y_size.textProperty().addListener(newTextFieldInputValidationChangeListener(tf_y_size));
+    }
+
+    private ChangeListener<String> newTextFieldInputValidationChangeListener(TextField textField) {
+        return new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                if (newValue != null && !newValue.equals("")) {
+                    if (!(newValue.matches("\\d+(\\.\\d+)?"))) {
+                        tf_x_size.textProperty().setValue(oldValue);
+                    } else {
+                        if (Integer.valueOf(newValue) > MAX_MAZE_SIZE) {
+                            textField.textProperty().setValue(String.valueOf(MAX_MAZE_SIZE));
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    private TextFormatter newTextFieldFormatter() {
+        return new TextFormatter<>(
+                change -> {
+                    if (change.getControlNewText().isEmpty()) {
+                        return change;
+                    }
+
+                    ParsePosition parsePosition = new ParsePosition(0);
+                    Object object = new DecimalFormat("#0").parse(change.getControlNewText(), parsePosition);
+
+                    if (object == null || parsePosition.getIndex() < change.getControlNewText().length()) {
+                        return null;
+                    } else {
+                        return change;
+                    }
+                }
+        );
     }
 
     public void onSliderSimulationChanged(InputEvent inputEvent) {
@@ -131,6 +214,8 @@ public class Controller {
             public void run() {
                 int counter = 0;
                 System.out.println("Counter value: " + counter);
+//                maze.getCurrent().modifyXY(maze.getStart());
+                maze = canvas_simulation.getMaze();
                 while (!maze.bestDepthFirstSearch(maze.getCurrent())) {
 
                     Platform.runLater(new Runnable() {
@@ -152,10 +237,7 @@ public class Controller {
                 }
             }
         };
-
         new Thread(BDFS).start();
-
-
     }
 
     public void onSliderMazeEditorChanged(InputEvent inputEvent) {
@@ -167,7 +249,7 @@ public class Controller {
         selectedCell = SelectedCell.none;
         int x = mazeView.validateMouseX(mouseEvent);
         int y = mazeView.validateMouseY(mouseEvent);
-        MyPoint2D cell = new MyPoint2D(x, y);
+        Cell cell = new Cell(x, y);
         if (mazeView.isStartCell(cell)) {
             selectedCell = SelectedCell.start_cell;
         }
@@ -191,7 +273,7 @@ public class Controller {
         int y = mazeView.validateMouseY(mouseEvent);
         switch (selectedCell) {
             case start_cell:
-                if (mazeView.isEndCell(new MyPoint2D(x, y))) {
+                if (mazeView.isEndCell(new Cell(x, y))) {
                     // do nothing
                 } else {
                     mazeView.setStartCellCoordinates(x, y);
@@ -201,7 +283,7 @@ public class Controller {
 
                 break;
             case end_cell:
-                if (mazeView.isStartCell(new MyPoint2D(x, y))) {
+                if (mazeView.isStartCell(new Cell(x, y))) {
                     // do nothing
                 } else {
                     mazeView.setEndCellCoordinates(x, y);
