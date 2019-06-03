@@ -1,7 +1,5 @@
 package maze_solver.model;
 
-import com.sun.istack.internal.NotNull;
-
 import java.util.Random;
 
 public class Maze {
@@ -23,85 +21,60 @@ public class Maze {
 
     private int[][] walls;
     private int[][] explored_maze_walls;
+    private int[][] explored_maze_walls_for_view;
 
     private Cell[][] cells;
 
-    /*******CONSTRUCTORS*******/
+    /*=============CONSTRUCTORS=============*/
 
-    public Maze(int length_X, int length_Y, StartCell generationStart, int[][] walls) {
-        if (length_X > MAX_SIZE || length_Y > MAX_SIZE) {
-            length_X = MAX_SIZE;
-            length_Y = MAX_SIZE;
-        }
-        this.length_X = length_X;
-        this.length_Y = length_Y;
-
-        if( generationStart == null){
-            Random rand = new Random();
-            this.generationStart = new StartCell(rand.nextInt(length_X), rand.nextInt(length_Y));
-        }else {
-            this.generationStart = generationStart;
-        }
-        this.walls = walls;
-    }
-
-    public Maze(int cols, int rows){
-
-    }
-
+    /**
+     * Default Constructor
+     * It generates a 5x4 maze.
+     */
     public Maze() {
-        this(5, 4, new StartCell(0, 0), new GoalCell(1, 0), new CurrentCell(0, 0), new Cell[5][4]);
-        initMazeWalls();
-        System.out.println("initial maze created");
-        current.setCoordinatesToCell(start);
-        System.out.println("current point set to start point");
+        initDefaultMaze();
     }
 
-    public Maze(int cols, int rows, @NotNull StartCell start, @NotNull GoalCell goal, @NotNull CurrentCell current, Cell[][] cells) {
+    /**
+     * Default Constructor for maze generation
+     *
+     * @param cols            Column number (<=@value {@link #MAX_SIZE})
+     * @param rows            Row number (<=@value {@link #MAX_SIZE})
+     * @param generationStart StartCell from where the algorithm starts the generation
+     * @param wallsEmpty      True to generate only sidewalls for the maze
+     */
+    public Maze(int cols, int rows, StartCell generationStart, boolean wallsEmpty) {
+        if (cols > MAX_SIZE || rows > MAX_SIZE) {
+            cols = MAX_SIZE;
+            rows = MAX_SIZE;
+        }
         this.length_X = cols;
         this.length_Y = rows;
-        this.start = start;
-        this.goal = goal;
-        this.current = current;
-        this.cells = cells;
-        initCells();
-    }
 
-    private void initCells() {
-        Cell c;
-        for (int x = 0; x < length_X; x++) {
-            for (int y = 0; y < length_Y; y++) {
-                c = cells[x][y] = new Cell(x, y);
-                c.setDestination_distance(c.distanceTo(goal));
-            }
+        if (generationStart == null || (generationStart.x > MAX_SIZE || generationStart.y > MAX_SIZE)) {
+            Random rand = new Random();
+            this.generationStart = new StartCell(rand.nextInt(cols), rand.nextInt(rows));
+        } else {
+            this.generationStart = generationStart;
         }
-        cells[start.x][start.y].setCost(0);
+        this.walls = wallsEmpty ? newWallArray(cols, rows) : newWallArrayWithAllWalls(cols, rows);
+        this.explored_maze_walls = newWallArrayWithAllWalls(cols, rows);
+        this.explored_maze_walls_for_view = newWallArray(cols, rows);
+        this.cells = newCellArray();
     }
 
-    private void initMazeWalls() {
-        int max_size = getWallsMaxSize(length_X, length_Y);
-        walls = new int[2][max_size];
-        explored_maze_walls = new int[2][max_size];
-
-        /* X DIR walls */
-        explored_maze_walls[X_DIR][0] = 0b11111;
-        explored_maze_walls[X_DIR][4] = 0b11111;
-        walls[X_DIR][0] = 0b11111;
-        walls[X_DIR][1] = 0b01110;
-        walls[X_DIR][2] = 0b00100;
-        walls[X_DIR][3] = 0b10010;
-        walls[X_DIR][4] = 0b11111;
-
-        /* Y DIR walls */
-        explored_maze_walls[Y_DIR][0] = 0b1111;
-        explored_maze_walls[Y_DIR][5] = 0b1111;
-        walls[Y_DIR][5] = 0b1111;
-        walls[Y_DIR][4] = 0b0010;
-        walls[Y_DIR][3] = 0b0100;
-        walls[Y_DIR][2] = 0b0010;
-        walls[Y_DIR][1] = 0b0111;
-        walls[Y_DIR][0] = 0b1111;
+    /**
+     * Simplified Constructor for maze generation
+     * It randomizes the start cell for generation and sets all walls.
+     *
+     * @param cols Column number (<=@value {@link #MAX_SIZE})
+     * @param rows Row number (<=@value {@link #MAX_SIZE})
+     */
+    public Maze(int cols, int rows) {
+        this(cols, rows, null, false);
     }
+
+    /*=============END OF CONSTRUCTORS=============*/
 
     public boolean getWall(int[][] walls, Cell c, WallType wall_type) {
         return getWall(walls, c.x, c.y, wall_type);
@@ -156,7 +129,6 @@ public class Maze {
         }
         return true;
     }
-
 
     public Cell getStart() {
         return start;
@@ -376,22 +348,133 @@ public class Maze {
 
     /*******GETTERS AND SETTERS*******/
 
-
     private int getWallsMaxSize(int cols, int rows) {
         return Integer.max(cols, rows) + 1;
     }
+
     /*******OVERRIDDEN FUNCTIONS*******/
+
+
     /*******FUNCTIONS*******/
 
-    private int[][] generateWallArray(int cols, int rows) {
+    private void initDefaultMazeWalls() {
+        int max_size = getWallsMaxSize(length_X, length_Y);
+        walls = new int[2][max_size];
+        explored_maze_walls = new int[2][max_size];
+
+        /* X DIR walls */
+        explored_maze_walls[X_DIR][0] = 0b11111;
+        explored_maze_walls[X_DIR][4] = 0b11111;
+        walls[X_DIR][0] = 0b11111;
+        walls[X_DIR][1] = 0b01110;
+        walls[X_DIR][2] = 0b00100;
+        walls[X_DIR][3] = 0b10010;
+        walls[X_DIR][4] = 0b11111;
+
+        /* Y DIR walls */
+        explored_maze_walls[Y_DIR][0] = 0b1111;
+        explored_maze_walls[Y_DIR][5] = 0b1111;
+        walls[Y_DIR][5] = 0b1111;
+        walls[Y_DIR][4] = 0b0010;
+        walls[Y_DIR][3] = 0b0100;
+        walls[Y_DIR][2] = 0b0010;
+        walls[Y_DIR][1] = 0b0111;
+        walls[Y_DIR][0] = 0b1111;
+    }
+
+    private void initDefaultMaze() {
+        this.length_X = 5;
+        this.length_Y = 4;
+        this.start = new StartCell(0, 0);
+        this.goal = new GoalCell(1, 0);
+        this.current = new CurrentCell(0, 0);
+        this.cells = newCellArray(start,goal);
+
+        initDefaultMazeWalls();
+
+        System.out.println("Maze with default parameters created");
+        current.setCoordinatesToCell(start);
+        System.out.println("current point set to start point");
+    }
+
+    private int[][] newWallArray(int cols, int rows) {
         int[][] walls = new int[DIR_SIZE][getWallsMaxSize(cols, rows)];
         for (int i = 0; i < cols; i++) {
             setWall(walls, i, 0, WallType.BOTTOM_WALL);
             setWall(walls, i, rows - 1, WallType.TOP_WALL);
-            setWall(walls, 0, i, WallType.LEFT_WALL);
-            setWall(walls, cols - 1, i, WallType.RIGHT_WALL);
+        }
+
+        for (int j = 0; j < rows; j++) {
+            setWall(walls, 0, j, WallType.LEFT_WALL);
+            setWall(walls, cols - 1, j, WallType.RIGHT_WALL);
         }
         return walls;
+    }
+
+    private int[][] newWallArrayWithAllWalls(int cols, int rows) {
+        int[][] walls = new int[DIR_SIZE][getWallsMaxSize(cols, rows)];
+
+        for (int x = 0; x <= cols; x++) {
+            for (int y = 0; y <= rows; y++) {
+                setWall(walls, x, y, WallType.BOTTOM_WALL);
+                setWall(walls, x, y, WallType.LEFT_WALL);
+            }
+        }
+
+        return walls;
+    }
+
+    private Cell[][] newCellArray(StartCell start, GoalCell goal) {
+        Cell[][] grid = new Cell[length_X][length_Y];
+        Cell c;
+        for (int x = 0; x < length_X; x++) {
+            for (int y = 0; y < length_Y; y++) {
+                c = grid[x][y] = new Cell(x, y);
+                if (goal != null) {
+                    c.setDestination_distance(c.distanceTo(goal));
+                }
+            }
+        }
+
+        if (start != null) {
+            grid[start.x][start.y].setCost(0);
+        }
+
+        return grid;
+    }
+
+    private Cell[][] newCellArray() {
+        return newCellArray(null, null);
+    }
+
+    private boolean resetWall(int[][] walls, int x, int y, WallType wallType) {
+        switch (wallType) {
+            case LEFT_WALL: {
+                walls[Y_DIR][x] ^= (~(0b1 << y));
+            }
+            break;
+            case RIGHT_WALL: {
+                walls[Y_DIR][x + 1] ^= (~(0b1 << y));
+
+            }
+            break;
+            case BOTTOM_WALL: {
+                walls[X_DIR][y] ^= (~(0b1 << x));
+            }
+            break;
+            case TOP_WALL: {
+                walls[X_DIR][y + 1] ^= (~(0b1 << x));
+            }
+            break;
+            default:
+                System.err.println("invalid wall type");
+                return false;
+        }
+        return true;
+    }
+
+    public boolean resetWall(int[][] walls, Cell c, WallType wallType) {
+        return resetWall(walls, c.x, c.y, wallType);
     }
 
     /*******ENUMS*******/
