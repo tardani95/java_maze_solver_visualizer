@@ -17,9 +17,9 @@
     <tabs>
         <Tab fx:id="tab_maze_editor" text="MazeEditor">
             <content>
-                <HBox fillHeight="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                <HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                     <children>
-                        <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="543.0" prefWidth="770.0">
+                        <VBox alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS">
                             <children>
                                 <AnchorPane fx:id="maze_editor_anchor_pane" minHeight="0.0" minWidth="0.0" prefHeight="543.0" prefWidth="563.0" VBox.vgrow="NEVER">
                                     <children>
