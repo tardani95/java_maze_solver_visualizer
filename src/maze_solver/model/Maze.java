@@ -7,7 +7,7 @@ public class Maze {
      * maximum maze side length in micromouse competition
      * [0:32)
      */
-    private static final int MAX_SIZE = 32;
+    public static final int MAX_MAZE_SIZE = 32;
     private static final int X_DIR = 0;
     private static final int Y_DIR = 1;
     private static final int DIR_SIZE = 2;
@@ -38,20 +38,20 @@ public class Maze {
     /**
      * Default Constructor for maze generation
      *
-     * @param cols            Column number (<=@value {@link #MAX_SIZE})
-     * @param rows            Row number (<=@value {@link #MAX_SIZE})
+     * @param cols            Column number (<=@value {@link #MAX_MAZE_SIZE})
+     * @param rows            Row number (<=@value {@link #MAX_MAZE_SIZE})
      * @param generationStart StartCell from where the algorithm starts the generation
      * @param wallsEmpty      True to generate only sidewalls for the maze
      */
     public Maze(int cols, int rows, StartCell generationStart, boolean wallsEmpty) {
-        if (cols > MAX_SIZE || rows > MAX_SIZE) {
-            cols = MAX_SIZE;
-            rows = MAX_SIZE;
+        if (cols > MAX_MAZE_SIZE || rows > MAX_MAZE_SIZE) {
+            cols = MAX_MAZE_SIZE;
+            rows = MAX_MAZE_SIZE;
         }
         this.length_X = cols;
         this.length_Y = rows;
 
-        if (generationStart == null || (generationStart.x > MAX_SIZE || generationStart.y > MAX_SIZE)) {
+        if (generationStart == null || (generationStart.x > MAX_MAZE_SIZE || generationStart.y > MAX_MAZE_SIZE)) {
             Random rand = new Random();
             this.generationStart = new StartCell(rand.nextInt(cols), rand.nextInt(rows));
         } else {
@@ -67,8 +67,8 @@ public class Maze {
      * Simplified Constructor for maze generation
      * It randomizes the start cell for generation and sets all walls.
      *
-     * @param cols Column number (<=@value {@link #MAX_SIZE})
-     * @param rows Row number (<=@value {@link #MAX_SIZE})
+     * @param cols Column number (<=@value {@link #MAX_MAZE_SIZE})
+     * @param rows Row number (<=@value {@link #MAX_MAZE_SIZE})
      */
     public Maze(int cols, int rows) {
         this(cols, rows, null, false);
