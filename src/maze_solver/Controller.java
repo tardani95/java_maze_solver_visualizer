@@ -61,7 +61,7 @@ public class Controller {
     void initialize() {
         System.out.println("Controller.initialize() called");
 
-        maze = new Maze();
+        maze = new Maze(6,6);
 //        cell_size = 30.0;
 
         canvas_maze_editor.setMaze(maze);
@@ -77,7 +77,7 @@ public class Controller {
         canvas_maze_editor.setGraphicContextTranslation();
         canvas_maze_editor.refreshView();
 
-        canvas_simulation.setMaze(maze);
+        canvas_simulation.setMaze(new Maze());
         canvas_simulation.setVisibility(true
                 , true
                 , true
@@ -131,6 +131,8 @@ public class Controller {
             public void run() {
                 int counter = 0;
                 System.out.println("Counter value: " + counter);
+//                maze.getCurrent().modifyXY(maze.getStart());
+                maze = canvas_simulation.getMaze();
                 while (!maze.bestDepthFirstSearch(maze.getCurrent())) {
 
                     Platform.runLater(new Runnable() {
@@ -152,10 +154,7 @@ public class Controller {
                 }
             }
         };
-
         new Thread(BDFS).start();
-
-
     }
 
     public void onSliderMazeEditorChanged(InputEvent inputEvent) {
