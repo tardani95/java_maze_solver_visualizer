@@ -41,6 +41,10 @@ public class MazeView extends Canvas {
         this.maze = maze;
     }
 
+    public Maze getMaze(){
+        return maze;
+    }
+
     public void setVisibility(boolean showWalls,
                               boolean showExploredWalls,
                               boolean showRobot,
@@ -169,15 +173,21 @@ public class MazeView extends Canvas {
     }
 
     private void drawStartCell() {
-        drawRect(maze.getStart(), Color.GREENYELLOW, 0);
+        if (maze.getStart() != null) {
+            drawRect(maze.getStart(), Color.GREENYELLOW, 0);
+        }
     }
 
     private void drawCurrentCell() {
-        drawRect(maze.getCurrent(), Color.GREEN, cell_size / 30 * 5);
+        if (maze.getCurrent() != null) {
+            drawRect(maze.getCurrent(), Color.GREEN, cell_size / 30 * 5);
+        }
     }
 
     private void drawDestinationCell() {
-        drawRect(maze.getGoal(), Color.ORANGERED, 0);
+        if (maze.getGoal() != null) {
+            drawRect(maze.getGoal(), Color.ORANGERED, 0);
+        }
     }
 
     private void drawVisitedCells() {
