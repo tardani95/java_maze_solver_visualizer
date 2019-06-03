@@ -203,6 +203,7 @@ public class Cell {
     public enum CellType {
         DEFAULT,
         CURRENT,
+        NEXT,
         START,
         DESTINATION
     }
