@@ -192,6 +192,10 @@ public class Cell {
         }
     }
 
+    public void modifyXY(Cell c){
+        modifyXY(c.x,c.y);
+    }
+
 
 
     /*******ENUMS*******/
