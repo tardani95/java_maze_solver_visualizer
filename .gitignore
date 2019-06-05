@@ -6,3 +6,11 @@ out/
 \.idea/uiDesigner\.xml
 
 doc/
+
+\.idea/compiler\.xml
+
+\.idea/description\.html
+
+\.idea/encodings\.xml
+
+\.idea/gradle\.xml
