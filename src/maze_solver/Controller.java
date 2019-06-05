@@ -213,10 +213,10 @@ public class Controller {
             @Override
             public void run() {
                 int counter = 0;
-                System.out.println("Counter value: " + counter);
+//                System.out.println("Counter value: " + counter);
 //                maze.getCurrent().modifyXY(maze.getStart());
                 maze = canvas_simulation.getMaze();
-                while (!maze.bestDepthFirstSearch(maze.getCurrent())) {
+                while (!maze.bestDepthFirstSearch(maze.getNext())) {
 
                     Platform.runLater(new Runnable() {
                         @Override
@@ -234,7 +234,16 @@ public class Controller {
                     }
 
                     System.out.println("Counter value: " + counter);
+                    counter++;
                 }
+
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        canvas_simulation.refreshView();
+//                            drawMaze(null);
+                    }
+                });
             }
         };
         new Thread(BDFS).start();

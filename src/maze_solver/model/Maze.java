@@ -18,6 +18,7 @@ public class Maze {
     private StartCell generationStart;
     private GoalCell goal;
     private CurrentCell current;
+    private Cell next;
 
     private int[][] walls;
     private int[][] explored_maze_walls;
@@ -142,6 +143,15 @@ public class Maze {
         return current;
     }
 
+    public Cell getNext() {
+        if (next == null) {
+            return current;
+        } else {
+
+            return next;
+        }
+    }
+
     public int getLength_X() {
         return length_X;
     }
@@ -222,8 +232,8 @@ public class Maze {
         System.out.println("initial cost set to integer max value");
     }
 
-    public boolean bestDepthFirstSearch(Cell myPoint2D) {
-        return bestDepthFirstSearch(myPoint2D.x, myPoint2D.y);
+    public boolean bestDepthFirstSearch(Cell nextCell) {
+        return bestDepthFirstSearch(nextCell.x, nextCell.y);
     }
 
     public boolean bestDepthFirstSearch(int x, int y) {
@@ -234,6 +244,7 @@ public class Maze {
         cells[current.x][current.y].setVisited();
 
         // if goal point reached then terminate
+        //noinspection EqualsBetweenInconvertibleTypes
         if (current.equals(goal)) {
             return true;
         }
@@ -242,22 +253,21 @@ public class Maze {
         discoverWalls(current);
 
         // calculates the following best move
-        Cell nextPosition = calcNextPosition(current);
+        next = calcNextPosition(current);
 
         // set next move cells parent
-        if (!cells[nextPosition.x][nextPosition.y].isVisited()) {
-            cells[nextPosition.x][nextPosition.y].setParent(cells[current.x][current.y]);
+        if (!cells[next.x][next.y].isVisited()) {
+            cells[next.x][next.y].setParent(cells[current.x][current.y]);
         }
 
         /*try*/
-        current.x = nextPosition.x;
-        current.y = nextPosition.y;
+//        current.x = next.x;
+//        current.y = next.y;
         return false;
 
         /*goal of try*/
-//        return bestDepthFirstSearch(nextPosition);
+//        return bestDepthFirstSearch(next);
     }
-
 
     public void discoverWalls(Cell current) {
         for (WallType wallType : WallType.values()) {
@@ -388,7 +398,7 @@ public class Maze {
         this.start = new StartCell(0, 0);
         this.goal = new GoalCell(1, 0);
         this.current = new CurrentCell(0, 0);
-        this.cells = newCellArray(start,goal);
+        this.cells = newCellArray(start, goal);
 
         initDefaultMazeWalls();
 
@@ -475,6 +485,19 @@ public class Maze {
 
     public boolean resetWall(int[][] walls, Cell c, WallType wallType) {
         return resetWall(walls, c.x, c.y, wallType);
+    }
+
+
+    public boolean randomizedDepthFirstSearch(int x, int y, boolean randomizedBranchDepth){
+
+        current.x = x;
+        current.y = y;
+
+        // set actual node as visited
+        cells[current.x][current.y].setVisited();
+
+
+        return false;
     }
 
     /*******ENUMS*******/
