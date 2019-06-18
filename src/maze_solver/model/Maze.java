@@ -26,6 +26,10 @@ public class Maze {
 
     private Cell[][] cells;
 
+
+    private int MAX_BRANCH_DEPTH;
+    private int branchDepth;
+
     /*=============CONSTRUCTORS=============*/
 
     /**
@@ -294,7 +298,6 @@ public class Maze {
         for (WallType wallType : WallType.values()) {
             if (!getWall(explored_maze_walls, current, wallType)) {
                 switch (wallType) {
-                    //TODO - check equality operator with doubles
                     case RIGHT_WALL: {
                         p = new Cell(current.x + 1, current.y);
                         if (cells[p.x][p.y].isVisited()) {
@@ -360,6 +363,10 @@ public class Maze {
 
     private int getWallsMaxSize(int cols, int rows) {
         return Integer.max(cols, rows) + 1;
+    }
+
+    public void setCurrent(Cell c) {
+        this.current = new CurrentCell(c.x, c.y);
     }
 
     /*******OVERRIDDEN FUNCTIONS*******/
@@ -460,20 +467,20 @@ public class Maze {
     private boolean resetWall(int[][] walls, int x, int y, WallType wallType) {
         switch (wallType) {
             case LEFT_WALL: {
-                walls[Y_DIR][x] ^= (~(0b1 << y));
+                walls[Y_DIR][x] &= (~(0b1 << y));
             }
             break;
             case RIGHT_WALL: {
-                walls[Y_DIR][x + 1] ^= (~(0b1 << y));
+                walls[Y_DIR][x + 1] &= (~(0b1 << y));
 
             }
             break;
             case BOTTOM_WALL: {
-                walls[X_DIR][y] ^= (~(0b1 << x));
+                walls[X_DIR][y] &= (~(0b1 << x));
             }
             break;
             case TOP_WALL: {
-                walls[X_DIR][y + 1] ^= (~(0b1 << x));
+                walls[X_DIR][y + 1] &= (~(0b1 << x));
             }
             break;
             default:
@@ -487,17 +494,149 @@ public class Maze {
         return resetWall(walls, c.x, c.y, wallType);
     }
 
+    private boolean isAllNeighbourVisited(Cell c) {
+        boolean isAllNeighbourVisited = true;
 
-    public boolean randomizedDepthFirstSearch(int x, int y, boolean randomizedBranchDepth){
+        if (c.x + 1 < length_X && !cells[c.x + 1][c.y].isVisited()) {
+            isAllNeighbourVisited = false;
+        }
 
-        current.x = x;
-        current.y = y;
+        if (c.y + 1 < length_Y && !cells[c.x][c.y + 1].isVisited()) {
+            isAllNeighbourVisited = false;
+        }
+
+        if (c.x != 0 && !cells[c.x - 1][c.y].isVisited()) { /*if c.x is null then the second condition is not executed*/
+            isAllNeighbourVisited = false;
+        }
+
+        if (c.y != 0 && !cells[c.x][c.y - 1].isVisited()) {
+            isAllNeighbourVisited = false;
+        }
+
+        return isAllNeighbourVisited;
+    }
+
+    private Cell randomNeighbour(Cell c) {
+        Cell neighbour = null;
+        Random random = new Random();
+
+        while (neighbour == null) {
+            switch (random.nextInt(4)) {
+                case 0:
+                    if (c.x + 1 != length_X) {
+                        neighbour = cells[c.x + 1][c.y];
+                    }
+                    break;
+                case 1:
+                    if (c.y + 1 != length_Y) {
+                        neighbour = cells[c.x][c.y + 1];
+                    }
+                    break;
+
+                case 2:
+
+                    if (c.x != 0) {
+                        neighbour = cells[c.x - 1][c.y];
+                    }
+                    break;
+
+                case 3:
+
+                    if (c.y != 0) {
+                        neighbour = cells[c.x][c.y - 1];
+                    }
+                    break;
+                default:
+                    System.out.println("wrong randomized number");
+                    break;
+            }
+
+            if (neighbour != null && neighbour.isVisited()) {
+                neighbour = null;
+            }
+        }
+
+        return neighbour;
+    }
+
+    private Cell getNeighbour(Cell current, int mode) {
+        switch (mode) {
+            case 0:
+                return randomNeighbour(current);
+            case 1:
+            default:
+                System.out.println("this mode has not implemented yet");
+                break;
+        }
+        return null;
+    }
+
+    private Direction getDirection(Cell c1, Cell c2) {
+        if (c2.x - c1.x > 0) {
+            return Direction.RIGHT;
+        }
+        if (c2.x - c1.x < 0) {
+            return Direction.LEFT;
+        }
+        if (c2.y - c1.y > 0) {
+            return Direction.TOP;
+        }
+        if (c2.y - c1.y < 0) {
+            return Direction.BOTTOM;
+        }
+        return Direction.UNKNOWN;
+    }
+
+    private void removeWall(Cell c1, Cell c2) {
+        Direction direction = getDirection(c1, c2);
+        switch (direction) {
+            case RIGHT:
+                resetWall(walls, c1, WallType.RIGHT_WALL);
+                break;
+            case TOP:
+                resetWall(walls, c1, WallType.TOP_WALL);
+                break;
+            case LEFT:
+                resetWall(walls, c1, WallType.LEFT_WALL);
+                break;
+            case BOTTOM:
+                resetWall(walls, c1, WallType.BOTTOM_WALL);
+                break;
+            default:
+                System.out.println("the two cells are not neighbours");
+                break;
+        }
+    }
+
+    public boolean randomizedDepthFirstSearch() {
+
+        Cell parent = getCell(current).getParent();
+        Cell next = null;
+
+        if (isAllNeighbourVisited(current)) {
+            /* TODO: set current cell color */
+            if (parent == null) { /* if parent null then it is the start cell or there is a bug in the program */
+                return true;
+            } else {
+                current.x = parent.x;
+                current.y = parent.y;
+            }
+        } else {
+            next = getNeighbour(current, 0);
+            removeWall(current, next);
+            next.setParent(getCell(current));
+            current.x = next.x;
+            current.y = next.y;
+        }
 
         // set actual node as visited
         cells[current.x][current.y].setVisited();
 
-
         return false;
+    }
+
+    public StartCell getGenerationStart() {
+        return generationStart;
     }
 
     /*******ENUMS*******/
@@ -513,5 +652,13 @@ public class Maze {
         WallType(int value) {
             this.value = value;
         }
+    }
+
+    public enum Direction {
+        RIGHT,
+        TOP,
+        LEFT,
+        BOTTOM,
+        UNKNOWN
     }
 }

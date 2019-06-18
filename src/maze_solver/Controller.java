@@ -64,10 +64,6 @@ public class Controller {
     private static Maze maze;
     private GraphicsContext gc;
 
-    public void onBtnGenerateMazePressed(ActionEvent actionEvent) {
-
-    }
-
     public void onInputTextChanged(InputMethodEvent inputMethodEvent) {
         System.out.println(inputMethodEvent.getSource());
     }
@@ -247,6 +243,53 @@ public class Controller {
             }
         };
         new Thread(BDFS).start();
+    }
+
+
+    public void onBtnGenerateMazePressed(ActionEvent actionEvent) {
+        Runnable generateMaze = new Runnable() {
+            @Override
+            public void run() {
+                int counter = 0;
+                canvas_maze_editor.setMaze(new Maze(Integer.valueOf(tf_x_size.textProperty().getValue()),Integer.valueOf(tf_y_size.textProperty().getValue())));
+                maze = canvas_maze_editor.getMaze();
+                maze.setCurrent(maze.getGenerationStart());
+                maze.getCell(maze.getCurrent()).setVisited();
+
+                while (!maze.randomizedDepthFirstSearch()) {
+
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            canvas_maze_editor.refreshView();
+//                            drawMaze(null);
+                        }
+                    });
+
+                    try {
+                        Thread.sleep(25);
+                    } catch (InterruptedException e) {
+                        System.out.println("Error: ");
+                        System.out.println(e.getMessage());
+                    }
+
+                    System.out.println("Counter value: " + counter);
+                    counter++;
+                }
+
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        canvas_maze_editor.refreshView();
+//                            drawMaze(null);
+                    }
+                });
+
+                System.out.println("Generation done!");
+            }
+        };
+
+        new Thread(generateMaze).start();
     }
 
     public void onSliderMazeEditorChanged(InputEvent inputEvent) {
