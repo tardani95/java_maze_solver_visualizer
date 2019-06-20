@@ -40,6 +40,32 @@ public class Maze {
         initDefaultMaze();
     }
 
+    private Maze(int length_X, int length_Y, StartCell start, StartCell generationStart, GoalCell goal, CurrentCell current, Cell next, int[][] walls, int[][] explored_maze_walls, int[][] explored_maze_walls_for_view, Cell[][] cells, int MAX_BRANCH_DEPTH, int branchDepth) {
+        this.length_X = length_X;
+        this.length_Y = length_Y;
+        this.start = start;
+        this.generationStart = generationStart;
+        this.goal = goal;
+        this.current = current;
+        this.next = next;
+        this.walls = walls;
+        this.explored_maze_walls = explored_maze_walls;
+        this.explored_maze_walls_for_view = explored_maze_walls_for_view;
+        this.cells = cells;
+        this.MAX_BRANCH_DEPTH = MAX_BRANCH_DEPTH;
+        this.branchDepth = branchDepth;
+    }
+
+    /**
+     * Default copy constructor
+     *
+     * @param maze maze to copy in a new maze object
+     */
+    public Maze(Maze maze) {
+        this(maze.length_X, maze.length_Y, maze.start, maze.generationStart, maze.goal, maze.current, maze.next, maze.walls, maze.explored_maze_walls, maze.explored_maze_walls_for_view, maze.cells, maze.MAX_BRANCH_DEPTH, maze.branchDepth);
+    }
+
+
     /**
      * Default Constructor for maze generation
      *
@@ -275,8 +301,8 @@ public class Maze {
 
     public void discoverWalls(Cell current) {
         for (WallType wallType : WallType.values()) {
-            if (getWall(walls, current, wallType)) {
-                setWall(explored_maze_walls, current, wallType);
+            if (!getWall(walls, current, wallType)) {
+                resetWall(explored_maze_walls, current, wallType);
             }
         }
     }
@@ -367,6 +393,14 @@ public class Maze {
 
     public void setCurrent(Cell c) {
         this.current = new CurrentCell(c.x, c.y);
+    }
+
+    public void newStartAt(int x, int y) {
+        start = new StartCell(x, y);
+    }
+
+    public void newGoalAt(int x, int y) {
+        goal = new GoalCell(x, y);
     }
 
     /*******OVERRIDDEN FUNCTIONS*******/
@@ -637,6 +671,19 @@ public class Maze {
 
     public StartCell getGenerationStart() {
         return generationStart;
+    }
+
+    public void resetMazeState(GoalCell goal) {
+        Cell c;
+        for (int i = 0; i < length_X; i++) {
+            for(int j =0;j<length_Y;j++){
+                c =  cells[i][j];
+                c.setVisited(false);
+                c.setParent(null);
+            }
+        }
+        initCost();
+        calcDistances(goal, Heuristic.EUCLIDEAN);
     }
 
     /*******ENUMS*******/

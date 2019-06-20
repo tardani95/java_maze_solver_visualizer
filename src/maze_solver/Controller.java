@@ -15,6 +15,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import maze_solver.model.Cell;
+import maze_solver.model.GoalCell;
 import maze_solver.model.Maze;
 import maze_solver.view.MazeView;
 
@@ -83,6 +84,7 @@ public class Controller {
 //
 //        }
     }
+
 
     private enum SelectedCell {
         none,
@@ -212,6 +214,10 @@ public class Controller {
 //                System.out.println("Counter value: " + counter);
 //                maze.getCurrent().modifyXY(maze.getStart());
                 maze = canvas_simulation.getMaze();
+                maze.resetMazeState((GoalCell) maze.getGoal());
+                maze.getCurrent().modifyXY(maze.getStart());
+                maze.getNext().modifyXY(maze.getCurrent());
+
                 while (!maze.bestDepthFirstSearch(maze.getNext())) {
 
                     Platform.runLater(new Runnable() {
@@ -266,12 +272,12 @@ public class Controller {
                         }
                     });
 
-                    try {
-                        Thread.sleep(25);
-                    } catch (InterruptedException e) {
-                        System.out.println("Error: ");
-                        System.out.println(e.getMessage());
-                    }
+//                    try {
+//                        Thread.sleep(25);
+//                    } catch (InterruptedException e) {
+//                        System.out.println("Error: ");
+//                        System.out.println(e.getMessage());
+//                    }
 
                     System.out.println("Counter value: " + counter);
                     counter++;
@@ -290,6 +296,15 @@ public class Controller {
         };
 
         new Thread(generateMaze).start();
+    }
+
+
+    public void onBtnSendToSimulationPressed(ActionEvent actionEvent) {
+        canvas_simulation.setMaze(new Maze(canvas_maze_editor.getMaze()));
+        maze = canvas_simulation.getMaze();
+        maze.newStartAt(0,0);
+        maze.newGoalAt(maze.getLength_X()-1,maze.getLength_Y()-1);
+
     }
 
     public void onSliderMazeEditorChanged(InputEvent inputEvent) {
