@@ -1,5 +1,8 @@
 package maze_solver.model;
 
+import javafx.application.Platform;
+import maze_solver.view.MazeView;
+
 import java.util.Random;
 
 public class Maze {
@@ -18,7 +21,7 @@ public class Maze {
     private StartCell generationStart;
     private GoalCell goal;
     private CurrentCell current;
-    private Cell next;
+    public Cell next;
 
     private int[][] walls;
     private int[][] explored_maze_walls;
@@ -301,8 +304,8 @@ public class Maze {
 
     public void discoverWalls(Cell current) {
         for (WallType wallType : WallType.values()) {
-            if (!getWall(walls, current, wallType)) {
-                resetWall(explored_maze_walls, current, wallType);
+            if (getWall(walls, current, wallType)) {
+                setWall(explored_maze_walls, current, wallType);
             }
         }
     }
@@ -450,14 +453,15 @@ public class Maze {
 
     private int[][] newWallArray(int cols, int rows) {
         int[][] walls = new int[DIR_SIZE][getWallsMaxSize(cols, rows)];
-        for (int i = 0; i < cols; i++) {
+        /*horizontal bottom and top wall*/
+        for (int i = 0; i <= cols; i++) {
             setWall(walls, i, 0, WallType.BOTTOM_WALL);
-            setWall(walls, i, rows - 1, WallType.TOP_WALL);
+            setWall(walls, i, rows-1, WallType.TOP_WALL);
         }
 
-        for (int j = 0; j < rows; j++) {
+        for (int j = 0; j <= rows; j++) {
             setWall(walls, 0, j, WallType.LEFT_WALL);
-            setWall(walls, cols - 1, j, WallType.RIGHT_WALL);
+            setWall(walls, cols-1, j, WallType.RIGHT_WALL);
         }
         return walls;
     }
@@ -465,8 +469,10 @@ public class Maze {
     private int[][] newWallArrayWithAllWalls(int cols, int rows) {
         int[][] walls = new int[DIR_SIZE][getWallsMaxSize(cols, rows)];
 
-        for (int x = 0; x <= cols; x++) {
-            for (int y = 0; y <= rows; y++) {
+        for (int x = 0; x < cols; x++) {
+            for (int y = 0; y < rows; y++) {
+                setWall(walls, x, y, WallType.RIGHT_WALL);
+                setWall(walls, x, y, WallType.TOP_WALL);
                 setWall(walls, x, y, WallType.BOTTOM_WALL);
                 setWall(walls, x, y, WallType.LEFT_WALL);
             }
@@ -684,6 +690,55 @@ public class Maze {
         }
         initCost();
         calcDistances(goal, Heuristic.EUCLIDEAN);
+    }
+
+    public void resetExploredWalls(){
+        explored_maze_walls = newWallArray(length_X,length_Y);
+    }
+
+    public void runBestDepthFirstSearch(MazeView canvas_simulation, Maze maze){
+        Runnable BDFS = new Runnable() {
+            @Override
+            public void run() {
+                int counter = 0;
+//                System.out.println("Counter value: " + counter);
+//                maze.getCurrent().modifyXY(maze.getStart());
+//                maze = canvas_simulation.getMaze();
+                maze.resetMazeState((GoalCell) maze.getGoal());
+                maze.getCurrent().modifyXY(maze.getStart());
+                maze.next = null;
+
+                while (!maze.bestDepthFirstSearch(maze.getNext())) {
+
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            canvas_simulation.refreshView();
+//                            drawMaze(null);
+                        }
+                    });
+
+                    try {
+                        Thread.sleep(70);
+                    } catch (InterruptedException e) {
+                        System.out.println("Error: ");
+                        System.out.println(e.getMessage());
+                    }
+
+                    System.out.println("Counter value: " + counter);
+                    counter++;
+                }
+
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        canvas_simulation.refreshView();
+//                            drawMaze(null);
+                    }
+                });
+            }
+        };
+        new Thread(BDFS).start();
     }
 
     /*******ENUMS*******/

@@ -6,7 +6,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Cursor;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.input.InputEvent;
@@ -207,48 +206,7 @@ public class Controller {
     public void runSimulation(MouseEvent mouseEvent) {
         System.out.println("run simulation button pressed");
 
-        Runnable BDFS = new Runnable() {
-            @Override
-            public void run() {
-                int counter = 0;
-//                System.out.println("Counter value: " + counter);
-//                maze.getCurrent().modifyXY(maze.getStart());
-                maze = canvas_simulation.getMaze();
-                maze.resetMazeState((GoalCell) maze.getGoal());
-                maze.getCurrent().modifyXY(maze.getStart());
-                maze.getNext().modifyXY(maze.getCurrent());
-
-                while (!maze.bestDepthFirstSearch(maze.getNext())) {
-
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            canvas_simulation.refreshView();
-//                            drawMaze(null);
-                        }
-                    });
-
-                    try {
-                        Thread.sleep(200);
-                    } catch (InterruptedException e) {
-                        System.out.println("Error: ");
-                        System.out.println(e.getMessage());
-                    }
-
-                    System.out.println("Counter value: " + counter);
-                    counter++;
-                }
-
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        canvas_simulation.refreshView();
-//                            drawMaze(null);
-                    }
-                });
-            }
-        };
-        new Thread(BDFS).start();
+        canvas_simulation.getMaze().runBestDepthFirstSearch(canvas_simulation,canvas_simulation.getMaze());
     }
 
 
@@ -304,7 +262,8 @@ public class Controller {
         maze = canvas_simulation.getMaze();
         maze.newStartAt(0,0);
         maze.newGoalAt(maze.getLength_X()-1,maze.getLength_Y()-1);
-
+        maze.resetMazeState((GoalCell)maze.getGoal());
+        maze.resetExploredWalls();
     }
 
     public void onSliderMazeEditorChanged(InputEvent inputEvent) {

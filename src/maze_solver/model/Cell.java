@@ -187,7 +187,7 @@ public class Cell {
     }
 
     public void modifyXY(int x, int y) {
-        if (modifyX(x) & modifyY(y)) {
+        if (modifyX(x) && modifyY(y)) {
             System.out.println(type.name() + " coordinates modified");
         }
     }

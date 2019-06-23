@@ -226,10 +226,10 @@ public class MazeView extends Canvas {
         gc.setLineWidth(lineWidth);
         gc.setStroke(color);
         //print horizontal walls
-        for (int row_i = 0; row_i < maze.getLength_Y() + 1; row_i++) {
+        for (int row_i = 0; row_i <= maze.getLength_Y(); row_i++) {
             for (int coll_i = 0; coll_i < maze.getLength_X(); coll_i++) {
 
-                if ((mazeWalls[0][row_i] & (0b1 << coll_i)) > 0) {
+                if (((mazeWalls[0][row_i] & (0b1 << coll_i))>>>coll_i) > 0) {
                     startX = coll_i * cell_size;
                     stopX = (coll_i + 1) * cell_size;
                     startY = row_i * cell_size;
@@ -241,10 +241,10 @@ public class MazeView extends Canvas {
         }
 
         //print vertical walls
-        for (int coll_i = 0; coll_i < maze.getLength_X() + 1; coll_i++) {
+        for (int coll_i = 0; coll_i <= maze.getLength_X(); coll_i++) {
             for (int row_i = 0; row_i < maze.getLength_Y(); row_i++) {
 
-                if ((mazeWalls[1][coll_i] & (0b1 << row_i)) > 0) {
+                if (((mazeWalls[1][coll_i] & (0b1 << row_i))>>>row_i) > 0) {
                     startX = coll_i * cell_size;
                     stopX = startX;
                     startY = row_i * cell_size;
